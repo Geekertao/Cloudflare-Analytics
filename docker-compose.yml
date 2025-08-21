@@ -1,0 +1,13 @@
+version: '3.8'
+
+services:
+  cf-analytics:
+    build: .
+    ports:
+      - "80:80"
+    environment:
+      - PORT=4000
+      - NGINX_PORT=80
+    volumes:
+      - ./server/zones.yml:/api/zones.yml:ro
+    restart: unless-stopped

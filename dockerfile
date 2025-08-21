@@ -14,7 +14,7 @@ RUN npm ci
 COPY server/ ./
 
 # ---------- 阶段 3：运行 ----------
-FROM nginx:alpine
+FROM nginx:1.25-alpine
 RUN apk add --no-cache nodejs npm gettext   # gettext 提供 envsubst
 COPY --from=web-build /web/build /usr/share/nginx/html
 COPY --from=api-build /api /api
