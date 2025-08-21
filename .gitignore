@@ -102,3 +102,7 @@ dist/
 
 # Docker
 .dockerignore
+
+# Exclude root public directory only
+/public
+!web/public/
