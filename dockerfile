@@ -2,8 +2,8 @@
 FROM node:20-alpine AS web-build
 WORKDIR /web
 COPY web/package*.json ./
-# 确保lock文件与package.json同步，使用npm ci进行干净安装
-RUN npm ci --only=production
+# 安装所有依赖（包括devDependencies）以支持构建
+RUN npm ci
 COPY web/ ./
 RUN npm run build
 
