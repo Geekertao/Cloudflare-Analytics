@@ -5,10 +5,76 @@ import fs from 'fs/promises';
 import yaml from 'js-yaml';
 import path from 'path';
 
-const CFG = yaml.load(await fs.readFile(new URL('./zones.yml', import.meta.url)));
 const OUT = './data/analytics.json';
-
 const PORT = process.env.PORT || 4000;
+
+// 配置加载函数
+function loadConfig() {
+  // 优先级1: 环境变量配置
+  if (process.env.CF_CONFIG) {
+    try {
+      return JSON.parse(process.env.CF_CONFIG);
+    } catch (e) {
+      console.error('CF_CONFIG 环境变量格式错误:', e.message);
+    }
+  }
+
+  // 优先级2: 解析环境变量中的tokens和zones
+  const config = { accounts: [] };
+  
+  // 支持 CF_TOKENS 和 CF_ZONES 的简写格式
+  if (process.env.CF_TOKENS && process.env.CF_ZONES) {
+    const tokens = process.env.CF_TOKENS.split(',').map(t => t.trim());
+    const zones = process.env.CF_ZONES.split(',').map(z => z.trim());
+    const domains = process.env.CF_DOMAINS ? process.env.CF_DOMAINS.split(',').map(d => d.trim()) : zones;
+    
+    if (tokens.length > 0 && zones.length > 0) {
+      config.accounts.push({
+        name: process.env.CF_ACCOUNT_NAME || "默认账户",
+        token: tokens[0],
+        zones: zones.map((zone_id, index) => ({
+          zone_id,
+          domain: domains[index] || zone_id
+        }))
+      });
+    }
+  }
+
+  // 支持 CF_TOKENS_1, CF_ZONES_1, CF_DOMAINS_1 的多账户格式
+  let accountIndex = 1;
+  while (process.env[`CF_TOKENS_${accountIndex}`]) {
+    const tokens = process.env[`CF_TOKENS_${accountIndex}`].split(',').map(t => t.trim());
+    const zones = process.env[`CF_ZONES_${accountIndex}`].split(',').map(z => z.trim());
+    const domains = process.env[`CF_DOMAINS_${accountIndex}`] ? 
+      process.env[`CF_DOMAINS_${accountIndex}`].split(',').map(d => d.trim()) : zones;
+    
+    if (tokens.length > 0 && zones.length > 0) {
+      config.accounts.push({
+        name: process.env[`CF_ACCOUNT_NAME_${accountIndex}`] || `账户${accountIndex}`,
+        token: tokens[0],
+        zones: zones.map((zone_id, index) => ({
+          zone_id,
+          domain: domains[index] || zone_id
+        }))
+      });
+    }
+    accountIndex++;
+  }
+
+  // 优先级3: 配置文件
+  if (config.accounts.length === 0) {
+    try {
+      const fileConfig = yaml.load(fs.readFileSync(new URL('./zones.yml', import.meta.url)));
+      return fileConfig;
+    } catch (e) {
+      console.error('无法加载配置文件:', e.message);
+    }
+  }
+
+  return config;
+}
+
+const CFG = loadConfig();
 
 // 抓数据 & 写文件
 async function updateData() {

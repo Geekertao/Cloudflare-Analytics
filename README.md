@@ -15,15 +15,51 @@
 
 ## 快速开始
 
-### 本地开发
+### 快速开始
 
-1. 克隆项目
+#### 配置方式（支持环境变量！）
+
+现在支持三种配置方式，按优先级排序：
+
+##### 方式1: 环境变量配置（推荐）
 ```bash
-git clone <repository-url>
-cd Cloudflare-Analytics
+# 单账户配置
+docker run -p 80:80 \
+  -e CF_TOKENS="你的Cloudflare_API_Token" \
+  -e CF_ZONES="zone_id_1,zone_id_2" \
+  -e CF_DOMAINS="example.com,cdn.example.com" \
+  -e CF_ACCOUNT_NAME="我的主账户" \
+  cf-analytics
+
+# 多账户配置
+docker run -p 80:80 \
+  -e CF_TOKENS_1="token1" \
+  -e CF_ZONES_1="zone1,zone2" \
+  -e CF_DOMAINS_1="site1.com,site2.com" \
+  -e CF_ACCOUNT_NAME_1="账户1" \
+  -e CF_TOKENS_2="token2" \
+  -e CF_ZONES_2="zone3,zone4" \
+  -e CF_DOMAINS_2="site3.com,site4.com" \
+  -e CF_ACCOUNT_NAME_2="账户2" \
+  cf-analytics
+
+# JSON格式配置
+docker run -p 80:80 \
+  -e CF_CONFIG='{"accounts":[{"name":"主账号","token":"your_token","zones":[{"zone_id":"zone1","domain":"example.com"},{"zone_id":"zone2","domain":"cdn.example.com"}]}]}' \
+  cf-analytics
 ```
 
-2. 配置Cloudflare账户
+##### 方式2: Docker Compose配置
+编辑 `docker-compose.yml` 文件，修改environment部分：
+```yaml
+environment:
+  - CF_TOKENS=your_cf_token_here
+  - CF_ZONES=zone_id_1,zone_id_2
+  - CF_DOMAINS=example.com,cdn.example.com
+  - CF_ACCOUNT_NAME=我的主账户
+```
+
+##### 方式3: 配置文件（传统方式）
 编辑 `server/zones.yml` 文件：
 ```yaml
 accounts:
@@ -34,15 +70,44 @@ accounts:
         zone_id: "你的Zone ID"
 ```
 
+#### 本地开发步骤
+
+1. 克隆项目
+```bash
+git clone <repository-url>
+cd Cloudflare-Analytics
+```
+
+2. 生成package-lock.json文件（重要！）
+```bash
+# 方法1：手动生成（推荐）
+cd web && npm install --package-lock-only && cd ..
+cd server && npm install --package-lock-only && cd ..
+
+# 方法2：使用辅助脚本
+node generate-lockfiles.js
+```
+
 3. 启动服务
 ```bash
-# 使用Docker Compose
+# 使用Docker Compose（推荐）
 docker-compose up -d
 
-# 或者直接构建
+# 或者直接构建运行
 docker build -t cf-analytics .
-docker run -p 80:80 cf-analytics
+docker run -p 80:80 \
+  -e CF_TOKENS="your_token" \
+  -e CF_ZONES="your_zone_id" \
+  -e CF_DOMAINS="your_domain" \
+  cf-analytics
 ```
+
+### 解决GitHub Actions构建问题
+
+如果遇到`npm ci`相关的构建错误，请确保：
+1. 所有package-lock.json文件都已生成并提交到git
+2. package.json和package-lock.json版本匹配
+3. 运行上述第2步的命令重新生成lock文件
 
 ### 环境变量
 - `PORT`: API端口 (默认: 4000)

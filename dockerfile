@@ -2,7 +2,8 @@
 FROM node:20-alpine AS web-build
 WORKDIR /web
 COPY web/package*.json ./
-RUN npm ci
+# 如果有lock文件就使用ci，否则使用install
+RUN if [ -f package-lock.json ]; then npm ci; else npm install; fi
 COPY web/ ./
 RUN npm run build
 
@@ -10,7 +11,8 @@ RUN npm run build
 FROM node:20-alpine AS api-build
 WORKDIR /api
 COPY server/package*.json ./
-RUN npm ci
+# 如果有lock文件就使用ci，否则使用install
+RUN if [ -f package-lock.json ]; then npm ci; else npm install; fi
 COPY server/ ./
 
 # ---------- 阶段 3：运行 ----------
