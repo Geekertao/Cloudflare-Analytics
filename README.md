@@ -1,14 +1,16 @@
 # Cloudflare Analytics Dashboard
 
-多账户、多Zone的Cloudflare流量分析仪表盘
+多账户、多 Zone 的 Cloudflare 流量分析仪表盘
 
 ## 功能特性
-- 支持多个Cloudflare账户
-- 多Zone流量监控
+
+- 支持多个 Cloudflare 账户
+- 多 Zone 流量监控
 - 实时数据图表展示
-- 30天历史数据分析
+- 30 天历史数据分析
 
 ## 技术栈
+
 - 前端：React + Recharts
 - 后端：Node.js + Express
 - 部署：Docker + Nginx
@@ -21,7 +23,8 @@
 
 现在支持三种配置方式，按优先级排序：
 
-##### 方式1: 环境变量配置（推荐）
+##### 方式 1: 环境变量配置（推荐）
+
 ```bash
 # 单账户配置
 docker run -p 80:80 \
@@ -49,8 +52,10 @@ docker run -p 80:80 \
   cf-analytics
 ```
 
-##### 方式2: Docker Compose配置
-编辑 `docker-compose.yml` 文件，修改environment部分：
+##### 方式 2: Docker Compose 配置
+
+编辑 `docker-compose.yml` 文件，修改 environment 部分：
+
 ```yaml
 environment:
   - CF_TOKENS=your_cf_token_here
@@ -59,8 +64,10 @@ environment:
   - CF_ACCOUNT_NAME=我的主账户
 ```
 
-##### 方式3: 配置文件（传统方式）
+##### 方式 3: 配置文件（传统方式）
+
 编辑 `server/zones.yml` 文件：
+
 ```yaml
 accounts:
   - name: "账户名称"
@@ -73,12 +80,14 @@ accounts:
 #### 本地开发步骤
 
 1. 克隆项目
+
 ```bash
 git clone <repository-url>
 cd Cloudflare-Analytics
 ```
 
-2. 生成package-lock.json文件（重要！）
+2. 生成 package-lock.json 文件（重要！）
+
 ```bash
 # 方法1：手动生成（推荐）
 cd web && npm install --package-lock-only && cd ..
@@ -89,6 +98,7 @@ node generate-lockfiles.js
 ```
 
 3. 启动服务
+
 ```bash
 # 使用Docker Compose（推荐）
 docker-compose up -d
@@ -102,27 +112,31 @@ docker run -p 80:80 \
   cf-analytics
 ```
 
-### 解决GitHub Actions构建问题
+### 解决 GitHub Actions 构建问题
 
 如果遇到`npm ci`相关的构建错误，请确保：
-1. 所有package-lock.json文件都已生成并提交到git
-2. package.json和package-lock.json版本匹配
-3. 运行上述第2步的命令重新生成lock文件
+
+1. 所有 package-lock.json 文件都已生成并提交到 git
+2. package.json 和 package-lock.json 版本匹配
+3. 运行上述第 2 步的命令重新生成 lock 文件
 
 ### 环境变量
-- `PORT`: API端口 (默认: 4000)
-- `NGINX_PORT`: Nginx端口 (默认: 80)
+
+- `PORT`: API 端口 (默认: 4000)
+- `NGINX_PORT`: Nginx 端口 (默认: 80)
 
 ## GitHub Actions
 
-本项目使用GitHub Actions自动构建并推送Docker镜像到GitHub Container Registry。
+本项目使用 GitHub Actions 自动构建并推送 Docker 镜像到 GitHub Container Registry。
 
 构建触发条件：
+
 - 推送到 `main` 或 `master` 分支
-- 创建Pull Request
+- 创建 Pull Request
 - 手动触发
 
 ## 项目结构
+
 ```
 ├── web/                    # 前端React应用
 ├── server/                 # 后端API服务
