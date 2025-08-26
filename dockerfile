@@ -6,8 +6,6 @@ WORKDIR /web
 RUN npm config set registry https://registry.npmjs.org/ && \
     npm config set fetch-timeout 300000 && \
     npm config set fetch-retries 3 && \
-    npm config set fetch-retry-delay 1000 && \
-    npm config set fetch-retry-maxtimeout 300000
 
 COPY web/package*.json ./
 # 安装所有依赖（包括devDependencies）以支持构建
@@ -27,8 +25,6 @@ WORKDIR /api
 RUN npm config set registry https://registry.npmjs.org/ && \
     npm config set fetch-timeout 300000 && \
     npm config set fetch-retries 3 && \
-    npm config set fetch-retry-delay 1000 && \
-    npm config set fetch-retry-maxtimeout 300000
 
 COPY server/package*.json ./
 # 确保lock文件与package.json同步，使用npm ci进行干净安装
