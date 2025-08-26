@@ -6,8 +6,7 @@ services:
     ports:
       - "80:80"
     environment:
-      # 基础配置
-      - PORT=4000
+      # 基础配置，若需修改此项，请同时修改上方后面的端口
       - NGINX_PORT=80
 
       # Cloudflare配置 - 单账户方式（与README.md docker run命令对应）
@@ -37,5 +36,8 @@ services:
     # 如果使用配置文件方式，取消下面的卷挂载注释
     # volumes:
     #   - ./server/zones.yml:/api/zones.yml:ro
+
+    container_name: cloudflare-analytics
+    image: geekertao/cloudflare-analytics:latest
 
     restart: unless-stopped
