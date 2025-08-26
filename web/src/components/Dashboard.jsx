@@ -18,7 +18,15 @@ const Dashboard = ({ accounts, selectedPeriod, onPeriodChange }) => {
     accounts.forEach(account => {
       account.zones?.forEach(zone => {
         if (zone.raw && Array.isArray(zone.raw)) {
-          zone.raw.forEach(dayData => {
+          // 根据selectedPeriod过滤数据，只统计最新的N天
+          const sortedData = zone.raw
+            .filter(d => d && d.dimensions && d.sum)
+            .sort((a, b) => new Date(a.dimensions.date) - new Date(b.dimensions.date));
+          
+          const periodData = sortedData.slice(-Math.min(sortedData.length, 
+            selectedPeriod === '1day' ? 1 : selectedPeriod === '3days' ? 3 : 7));
+          
+          periodData.forEach(dayData => {
             if (dayData.sum) {
               totalRequests += parseInt(dayData.sum.requests) || 0;
               totalBytes += parseInt(dayData.sum.bytes) || 0;
@@ -27,6 +35,7 @@ const Dashboard = ({ accounts, selectedPeriod, onPeriodChange }) => {
               totalCachedBytes += parseInt(dayData.sum.cachedBytes) || 0;
             }
           });
+          
           allZonesData.push({
             ...zone,
             accountName: account.name
@@ -45,7 +54,7 @@ const Dashboard = ({ accounts, selectedPeriod, onPeriodChange }) => {
       cacheRequestsRatio: totalRequests > 0 ? ((totalCachedRequests / totalRequests) * 100).toFixed(1) : 0,
       cacheBytesRatio: totalBytes > 0 ? ((totalCachedBytes / totalBytes) * 100).toFixed(1) : 0
     };
-  }, [accounts]);
+  }, [accounts, selectedPeriod]); // 添加selectedPeriod作为依赖项
 
   const formatBytes = (bytes) => {
     if (bytes === 0) return '0 B';

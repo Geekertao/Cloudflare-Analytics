@@ -252,8 +252,12 @@ async function updateData() {
       for (const [zoneIndex, z] of acc.zones.entries()) {
         try {
           console.log(`    处理 Zone ${zoneIndex + 1}/${acc.zones.length}: ${z.domain}`);
-          const since = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString().slice(0, 10);
-          const until = new Date().toISOString().slice(0, 10);
+          // 获取更大的时间范围以确保有足够的最新数据
+          const since = new Date(Date.now() - 45 * 24 * 60 * 60 * 1000).toISOString().slice(0, 10); // 45天前
+          const until = new Date().toISOString().slice(0, 10); // 今天
+
+          console.log(`    查询时间范围: ${since} 到 ${until}`);
+
           const query = `
             query($zone: String!, $since: Date!, $until: Date!) {
               viewer {
@@ -261,7 +265,7 @@ async function updateData() {
                   httpRequests1dGroups(
                     filter: {date_geq: $since, date_leq: $until}
                     limit: 100
-                    orderBy: [date_ASC]
+                    orderBy: [date_DESC]
                   ) {
                     dimensions {
                       date
@@ -300,6 +304,13 @@ async function updateData() {
           } else if (res.data.data?.viewer?.zones?.[0]?.httpRequests1dGroups) {
             const rawData = res.data.data.viewer.zones[0].httpRequests1dGroups;
             console.log(`    Zone ${z.domain} 数据获取成功: ${rawData.length} 条记录`);
+
+            // 打印最新的几条数据的日期，便于调试
+            if (rawData.length > 0) {
+              const latestDates = rawData.slice(0, 3).map(d => d.dimensions.date);
+              console.log(`    最新数据日期: ${latestDates.join(', ')}`);
+            }
+
             accData.zones.push({ domain: z.domain, raw: rawData });
           } else {
             console.warn(`    Zone ${z.domain} 返回数据为空`);

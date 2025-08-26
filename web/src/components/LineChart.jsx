@@ -63,7 +63,7 @@ const CFLineChart = ({ domain, raw, selectedPeriod }) => {
       };
     })
     .sort((a, b) => new Date(a.originalDate) - new Date(b.originalDate)) // 按日期排序
-    .slice(0, selectedPeriod === '1day' ? 1 : selectedPeriod === '3days' ? 3 : 7); // 根据选择的时间范围过滤
+    .slice(-Math.min(raw.length, selectedPeriod === '1day' ? 1 : selectedPeriod === '3days' ? 3 : 7)); // 取最新的N天数据
 
   if (data.length === 0) {
     return (
