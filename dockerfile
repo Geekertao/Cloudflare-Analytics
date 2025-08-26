@@ -22,11 +22,12 @@ FROM node:20-alpine AS api-build
 WORKDIR /api
 
 # 设置npm配置以提高可靠性
+
+COPY server/package*.json ./
 RUN npm config set registry https://registry.npmjs.org/ && \
     npm config set fetch-timeout 300000 && \
     npm config set fetch-retries 3 && \
 
-COPY server/package*.json ./
 # 确保lock文件与package.json同步，使用npm ci进行干净安装
 RUN npm ci --only=production --prefer-offline --no-audit --no-fund || \
     (sleep 10 && npm ci --only=production --prefer-offline --no-audit --no-fund) || \
