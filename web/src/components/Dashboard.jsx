@@ -92,7 +92,10 @@ const Dashboard = ({ accounts, selectedPeriod, onPeriodChange }) => {
     return (
       <div className="dashboard">
         <div className="dashboard-header">
-          <h1 className="dashboard-title">Cloudflare 分析数据</h1>
+          <h1 className="dashboard-title">
+            <img src="/favicon.svg" alt="Cloudflare" className="dashboard-icon" />
+            Cloudflare 分析数据
+          </h1>
           <p className="dashboard-subtitle">暂无数据</p>
         </div>
       </div>
@@ -133,7 +136,10 @@ const Dashboard = ({ accounts, selectedPeriod, onPeriodChange }) => {
 
       {/* 标题区域 */}
       <div className="dashboard-header">
-        <h1 className="dashboard-title">Cloudflare 分析数据</h1>
+        <h1 className="dashboard-title">
+          <img src="/favicon.svg" alt="Cloudflare" className="dashboard-icon" />
+          Cloudflare 分析数据
+        </h1>
         <p className="dashboard-subtitle">Cloudflare流量分析仪表盘</p>
         
         {/* 时间段选择器 */}
@@ -218,6 +224,20 @@ const Dashboard = ({ accounts, selectedPeriod, onPeriodChange }) => {
             </div>
           </div>
         ))}
+      </div>
+
+      {/* 页面底部 Powered by */}
+      <div className="powered-by-section">
+        <div className="powered-by-content">
+          <p className="powered-by-text">Powered by</p>
+          <div className="powered-by-badges">
+            <a href="https://github.com/Geekertao/Cloudflare-Analytics"><img src="https://img.shields.io/badge/Cloudflare%20Analytics-Dashboard-F38020?style=for-the-badge&logo=cloudflare&logoColor=white" alt="Cloudflare Analytics" />
+            </a>
+            <a href="https://github.com/Geekertao/Cloudflare-Analytics">
+              <img src="https://img.shields.io/badge/GitHub-Click%20to%20open-181717?style=for-the-badge&logo=github&logoColor=white" alt="GitHub Repository" />
+            </a>
+          </div>
+        </div>
       </div>
     </div>
   );

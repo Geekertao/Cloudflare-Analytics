@@ -89,6 +89,16 @@
   font-weight: 700;
   color: #333;
   margin-bottom: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+}
+
+.dashboard-icon {
+  width: 40px;
+  height: 40px;
+  vertical-align: middle;
 }
 
 .dashboard-subtitle {
@@ -326,6 +336,51 @@
   transition: width 0.3s ease;
 }
 
+/* Powered by 区域样式 */
+.powered-by-section {
+  margin-top: 40px;
+  padding: 30px 20px;
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  text-align: center;
+}
+
+.powered-by-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+}
+
+.powered-by-text {
+  color: white;
+  font-size: 16px;
+  font-weight: 500;
+  margin: 0;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.powered-by-badges {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 12px;
+}
+
+.powered-by-badges img {
+  height: 28px;
+  transition: transform 0.3s ease, opacity 0.3s ease;
+  border-radius: 4px;
+}
+
+.powered-by-badges img:hover {
+  transform: translateY(-2px) scale(1.05);
+  opacity: 0.9;
+}
+
 /* 响应式设计 */
 @media (max-width: 768px) {
   .dashboard {
@@ -343,6 +398,11 @@
   
   .dashboard-title {
     font-size: 24px;
+  }
+
+  .dashboard-icon {
+    width: 32px;
+    height: 32px;
   }
   
   .period-selector {
@@ -387,4 +447,23 @@
     background: #5a6fd8;
     transform: none;
   }
+
+  /* 移动端 Powered by 样式优化 */
+  .powered-by-section {
+    margin-top: 30px;
+    padding: 20px 16px;
+  }
+
+  .powered-by-text {
+    font-size: 14px;
+  }
+
+  .powered-by-badges {
+    gap: 8px;
+  }
+
+  .powered-by-badges img {
+    height: 24px;
+  }
+
 }
