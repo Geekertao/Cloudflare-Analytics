@@ -3,22 +3,22 @@ import React from 'react';
 const StatsCards = ({ totalRequests, totalBytes, totalThreats, formatNumber, formatBytes }) => {
   const stats = [
     {
-      label: '总请求数(近30天)',
+      label: '总请求数',
       value: formatNumber(totalRequests),
       icon: '📊'
     },
     {
-      label: '总带宽使用(近30天)',
+      label: '总带宽使用',
       value: formatBytes(totalBytes),
       icon: '📈'
     },
     {
-      label: '威胁请求数(近30天)',
+      label: '威胁请求数',
       value: formatNumber(totalThreats),
       icon: '🛡️'
     },
     {
-      label: '活跃Zone数(近30天)',
+      label: '活跃Zone数',
       value: '多个', // 可以根据实际需要计算
       icon: '🌐'
     }
