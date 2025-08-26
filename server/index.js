@@ -336,7 +336,7 @@ async function updateData() {
   }
 }
 await updateData();
-cron.schedule('* * * * *', updateData);
+cron.schedule('0 */2 * * *', updateData);
 
 const app = express();
 
