@@ -1,13 +1,13 @@
 events {}
 http {
   server {
-    listen ${NGINX_PORT:-80};
+    listen ${NGINX_PORT};
     location / {
       root /usr/share/nginx/html;
       try_files $uri /index.html;
     }
     location /api/ {
-      proxy_pass http://localhost:${PORT:-4000}/;
+      proxy_pass http://localhost:${PORT}/;
     }
     location /data/ {
       root /api;
