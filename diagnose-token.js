@@ -105,9 +105,19 @@ async function diagnoseToken(token) {
             query($zone: String!, $since: Date!, $until: Date!) {
               viewer {
                 zones(filter: {zoneTag: $zone}) {
-                  httpRequests1dGroups(filter: {date_geq: $since, date_leq: $until}) {
-                    dimensions { date }
-                    sum { requests bytes threats }
+                  httpRequests1dGroups(
+                    filter: {date_geq: $since, date_leq: $until}
+                    limit: 10
+                    orderBy: [date_ASC]
+                  ) {
+                    dimensions { 
+                      date 
+                    }
+                    sum { 
+                      requests 
+                      bytes 
+                      threats 
+                    }
                   }
                 }
               }

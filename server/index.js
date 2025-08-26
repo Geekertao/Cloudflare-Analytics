@@ -255,12 +255,24 @@ async function updateData() {
           const since = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString().slice(0, 10);
           const until = new Date().toISOString().slice(0, 10);
           const query = `
-            query($zone:String!,$since:Date!,$until:Date!){
-              viewer{
-                zones(filter:{zoneTag:$zone}){
-                  httpRequests1dGroups(filter:{date_geq:$since,date_leq:$until}){
-                    dimensions{date}
-                    sum{requests bytes threats cachedRequests cachedBytes}
+            query($zone: String!, $since: Date!, $until: Date!) {
+              viewer {
+                zones(filter: {zoneTag: $zone}) {
+                  httpRequests1dGroups(
+                    filter: {date_geq: $since, date_leq: $until}
+                    limit: 100
+                    orderBy: [date_ASC]
+                  ) {
+                    dimensions {
+                      date
+                    }
+                    sum {
+                      requests
+                      bytes
+                      threats
+                      cachedRequests
+                      cachedBytes
+                    }
                   }
                 }
               }
@@ -270,8 +282,11 @@ async function updateData() {
             'https://api.cloudflare.com/client/v4/graphql',
             { query, variables: { zone: z.zone_id, since, until } },
             {
-              headers: { Authorization: `Bearer ${acc.token}` },
-              timeout: 30000 // 30秒超时
+              headers: {
+                'Authorization': `Bearer ${acc.token}`,
+                'Content-Type': 'application/json'
+              },
+              timeout: 30000
             }
           );
 
