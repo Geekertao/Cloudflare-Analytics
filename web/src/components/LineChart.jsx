@@ -10,13 +10,33 @@ import {
   ResponsiveContainer
 } from 'recharts';
 
-const CFLineChart = ({ domain, raw }) => {
+const CFLineChart = ({ domain, raw, selectedPeriod }) => {
   // 数据验证
   if (!raw || !Array.isArray(raw) || raw.length === 0) {
     return (
-      <div style={{ marginBottom: 40, padding: 20, border: '1px solid #eee', borderRadius: 8 }}>
-        <h3>{domain}</h3>
-        <p style={{ color: '#999' }}>暂无数据或数据格式错误</p>
+      <div style={{ 
+        background: 'white',
+        padding: '24px',
+        borderRadius: '12px',
+        boxShadow: '0 4px 20px rgba(0, 0, 0, 0.1)',
+        marginBottom: '20px'
+      }}>
+        <h3 style={{ 
+          margin: '0 0 12px 0', 
+          color: '#333',
+          fontSize: '18px',
+          fontWeight: '600'
+        }}>
+          {domain}
+        </h3>
+        <p style={{ 
+          color: '#999',
+          margin: 0,
+          textAlign: 'center',
+          padding: '40px 0'
+        }}>
+          暂无数据或数据格式错误
+        </p>
       </div>
     );
   }
@@ -42,13 +62,34 @@ const CFLineChart = ({ domain, raw }) => {
         cachedBytes: parseInt(d.sum.cachedBytes) || 0
       };
     })
-    .sort((a, b) => new Date(a.originalDate) - new Date(b.originalDate)); // 按日期排序
+    .sort((a, b) => new Date(a.originalDate) - new Date(b.originalDate)) // 按日期排序
+    .slice(0, selectedPeriod === '1day' ? 1 : selectedPeriod === '3days' ? 3 : 7); // 根据选择的时间范围过滤
 
   if (data.length === 0) {
     return (
-      <div style={{ marginBottom: 40, padding: 20, border: '1px solid #eee', borderRadius: 8 }}>
-        <h3>{domain}</h3>
-        <p style={{ color: '#999' }}>数据格式错误或无有效数据</p>
+      <div style={{ 
+        background: 'white',
+        padding: '24px',
+        borderRadius: '12px',
+        boxShadow: '0 4px 20px rgba(0, 0, 0, 0.1)',
+        marginBottom: '20px'
+      }}>
+        <h3 style={{ 
+          margin: '0 0 12px 0', 
+          color: '#333',
+          fontSize: '18px',
+          fontWeight: '600'
+        }}>
+          {domain}
+        </h3>
+        <p style={{ 
+          color: '#999',
+          margin: 0,
+          textAlign: 'center',
+          padding: '40px 0'
+        }}>
+          数据格式错误或无有效数据
+        </p>
       </div>
     );
   }
@@ -72,15 +113,16 @@ const CFLineChart = ({ domain, raw }) => {
       return (
         <div style={{
           backgroundColor: 'white',
-          padding: '10px',
-          border: '1px solid #ccc',
-          borderRadius: '4px',
-          boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
+          padding: '12px',
+          border: '1px solid #e1e1e1',
+          borderRadius: '8px',
+          boxShadow: '0 4px 12px rgba(0,0,0,0.1)'
         }}>
-          <p style={{ margin: '0 0 8px 0', fontWeight: 'bold' }}>{`日期: ${label}`}</p>
+          <p style={{ margin: '0 0 8px 0', fontWeight: '600', color: '#333' }}>
+            {`日期: ${label}`}
+          </p>
           {payload.map((entry, index) => {
             let value = entry.value;
-            let unit = '';
             
             if (entry.dataKey === 'bytes' || entry.dataKey === 'cachedBytes') {
               value = formatBytes(entry.value);
@@ -89,7 +131,11 @@ const CFLineChart = ({ domain, raw }) => {
             }
             
             return (
-              <p key={index} style={{ margin: '4px 0', color: entry.color }}>
+              <p key={index} style={{ 
+                margin: '4px 0', 
+                color: entry.color,
+                fontSize: '14px'
+              }}>
                 {`${entry.name}: ${value}`}
               </p>
             );
@@ -100,38 +146,106 @@ const CFLineChart = ({ domain, raw }) => {
     return null;
   };
 
+  // 计算总计数据
+  const totalData = data.reduce((acc, curr) => {
+    acc.requests += curr.requests;
+    acc.bytes += curr.bytes;
+    acc.threats += curr.threats;
+    acc.cachedRequests += curr.cachedRequests;
+    return acc;
+  }, { requests: 0, bytes: 0, threats: 0, cachedRequests: 0 });
+
+  const cacheRatio = totalData.requests > 0 ? 
+    ((totalData.cachedRequests / totalData.requests) * 100).toFixed(1) : 0;
+
   return (
     <div style={{ 
-      marginBottom: 40, 
-      padding: 20, 
-      border: '1px solid #eee', 
-      borderRadius: 8,
-      backgroundColor: '#fafafa'
+      background: 'white',
+      padding: '24px',
+      borderRadius: '12px',
+      boxShadow: '0 4px 20px rgba(0, 0, 0, 0.1)',
+      marginBottom: '20px'
     }}>
-      <h3 style={{ margin: '0 0 20px 0', color: '#333' }}>{domain}</h3>
-      <ResponsiveContainer width="100%" height={400}>
+      {/* 头部信息 */}
+      <div style={{ 
+        display: 'flex', 
+        justifyContent: 'space-between', 
+        alignItems: 'flex-start',
+        marginBottom: '20px',
+        flexWrap: 'wrap',
+        gap: '16px'
+      }}>
+        <div>
+          <h3 style={{ 
+            margin: '0 0 8px 0', 
+            color: '#333',
+            fontSize: '18px',
+            fontWeight: '600'
+          }}>
+            {domain}
+          </h3>
+          <p style={{ 
+            color: '#666',
+            margin: 0,
+            fontSize: '14px'
+          }}>
+            数据范围: {data.length > 0 ? 
+              `${data[0].originalDate} 至 ${data[data.length - 1].originalDate}` : 'N/A'}
+          </p>
+        </div>
+        
+        {/* 快速统计 */}
+        <div style={{ 
+          display: 'flex', 
+          gap: '20px',
+          fontSize: '12px',
+          color: '#666'
+        }}>
+          <div style={{ textAlign: 'center' }}>
+            <div style={{ fontWeight: '600', color: '#333' }}>
+              {formatNumber(totalData.requests)}
+            </div>
+            <div>总请求</div>
+          </div>
+          <div style={{ textAlign: 'center' }}>
+            <div style={{ fontWeight: '600', color: '#333' }}>
+              {formatBytes(totalData.bytes)}
+            </div>
+            <div>总流量</div>
+          </div>
+          <div style={{ textAlign: 'center' }}>
+            <div style={{ fontWeight: '600', color: '#667eea' }}>
+              {cacheRatio}%
+            </div>
+            <div>缓存率</div>
+          </div>
+        </div>
+      </div>
+      
+      {/* 图表 */}
+      <ResponsiveContainer width="100%" height={350}>
         <LineChart 
           data={data} 
-          margin={{ top: 20, right: 30, left: 20, bottom: 60 }}
+          margin={{ top: 20, right: 30, left: 20, bottom: 20 }}
         >
-          <CartesianGrid strokeDasharray="3 3" stroke="#e0e0e0" />
+          <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
           <XAxis 
             dataKey="date" 
-            tick={{ fontSize: 12 }}
-            angle={-45}
-            textAnchor="end"
-            height={60}
+            tick={{ fontSize: 12, fill: '#666' }}
+            axisLine={{ stroke: '#e1e1e1' }}
           />
           <YAxis 
             yAxisId="left" 
-            tick={{ fontSize: 12 }}
+            tick={{ fontSize: 12, fill: '#666' }}
             tickFormatter={formatNumber}
+            axisLine={{ stroke: '#e1e1e1' }}
           />
           <YAxis 
             yAxisId="right" 
             orientation="right" 
-            tick={{ fontSize: 12 }}
+            tick={{ fontSize: 12, fill: '#666' }}
             tickFormatter={formatBytes}
+            axisLine={{ stroke: '#e1e1e1' }}
           />
           <Tooltip content={<CustomTooltip />} />
           <Legend />
@@ -139,54 +253,45 @@ const CFLineChart = ({ domain, raw }) => {
             yAxisId="left"
             type="monotone"
             dataKey="requests"
-            stroke="#8884d8"
-            strokeWidth={2}
+            stroke="#667eea"
+            strokeWidth={3}
             name="请求数"
             connectNulls={false}
+            dot={{ fill: '#667eea', strokeWidth: 2, r: 4 }}
           />
           <Line
             yAxisId="left"
             type="monotone"
             dataKey="cachedRequests"
-            stroke="#82ca9d"
+            stroke="#764ba2"
             strokeWidth={2}
             strokeDasharray="5 5"
             name="缓存请求数"
             connectNulls={false}
+            dot={{ fill: '#764ba2', strokeWidth: 2, r: 3 }}
           />
           <Line
             yAxisId="right"
             type="monotone"
             dataKey="bytes"
-            stroke="#ff7300"
-            strokeWidth={2}
+            stroke="#f093fb"
+            strokeWidth={3}
             name="流量"
             connectNulls={false}
-          />
-          <Line
-            yAxisId="right"
-            type="monotone"
-            dataKey="cachedBytes"
-            stroke="#ffc658"
-            strokeWidth={2}
-            strokeDasharray="5 5"
-            name="缓存流量"
-            connectNulls={false}
+            dot={{ fill: '#f093fb', strokeWidth: 2, r: 4 }}
           />
           <Line
             yAxisId="left"
             type="monotone"
             dataKey="threats"
-            stroke="#e74c3c"
+            stroke="#ff6b6b"
             strokeWidth={2}
             name="威胁数"
             connectNulls={false}
+            dot={{ fill: '#ff6b6b', strokeWidth: 2, r: 3 }}
           />
         </LineChart>
       </ResponsiveContainer>
-      <div style={{ marginTop: 10, fontSize: 12, color: '#666' }}>
-        <p>数据范围: {data.length > 0 ? `${data[0].originalDate} 至 ${data[data.length - 1].originalDate}` : 'N/A'}</p>
-      </div>
     </div>
   );
 };

@@ -74,12 +74,175 @@ function loadConfig() {
   return config;
 }
 
+// 验证API Token的功能
+async function validateToken(token, zoneName) {
+  try {
+    console.log(`[Token验证] 验证Token对Zone ${zoneName}的访问权限...`);
+
+    // 1. 首先测试基本的API访问
+    const testQuery = `
+      query {
+        viewer {
+          zones(limit: 1) {
+            zoneTag
+            name
+          }
+        }
+      }`;
+
+    const response = await axios.post(
+      'https://api.cloudflare.com/client/v4/graphql',
+      { query: testQuery },
+      {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        },
+        timeout: 15000
+      }
+    );
+
+    if (response.data.errors) {
+      console.error(`[Token验证] API访问失败:`, response.data.errors);
+      return {
+        valid: false,
+        error: 'API访问被拒绝',
+        details: response.data.errors
+      };
+    }
+
+    if (!response.data.data?.viewer?.zones) {
+      console.error(`[Token验证] Token无法访问任何Zone`);
+      return {
+        valid: false,
+        error: 'Token无Zone访问权限'
+      };
+    }
+
+    const accessibleZones = response.data.data.viewer.zones;
+    console.log(`[Token验证] Token可访问 ${accessibleZones.length} 个Zone`);
+
+    return {
+      valid: true,
+      accessibleZones: accessibleZones.length,
+      zones: accessibleZones
+    };
+
+  } catch (error) {
+    console.error(`[Token验证] 验证过程出错:`, error.message);
+    if (error.response?.status === 401) {
+      return {
+        valid: false,
+        error: 'Token无效或已过期',
+        httpStatus: 401
+      };
+    }
+    if (error.response?.status === 403) {
+      return {
+        valid: false,
+        error: 'Token权限不足',
+        httpStatus: 403
+      };
+    }
+    return {
+      valid: false,
+      error: error.message,
+      httpStatus: error.response?.status
+    };
+  }
+}
+
+// 获取Zone信息的函数
+async function getZoneInfo(token, zoneId) {
+  try {
+    const query = `
+      query($zoneId: String!) {
+        viewer {
+          zones(filter: {zoneTag: $zoneId}) {
+            zoneTag
+            name
+            status
+          }
+        }
+      }`;
+
+    const response = await axios.post(
+      'https://api.cloudflare.com/client/v4/graphql',
+      { query, variables: { zoneId } },
+      {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        },
+        timeout: 15000
+      }
+    );
+
+    if (response.data.errors) {
+      console.error(`[Zone信息] Zone ${zoneId} 查询失败:`, response.data.errors);
+      return null;
+    }
+
+    const zones = response.data.data?.viewer?.zones;
+    if (!zones || zones.length === 0) {
+      console.error(`[Zone信息] Zone ${zoneId} 不存在或无访问权限`);
+      return null;
+    }
+
+    return zones[0];
+  } catch (error) {
+    console.error(`[Zone信息] 查询Zone ${zoneId} 出错:`, error.message);
+    return null;
+  }
+}
+
 const CFG = loadConfig();
+
+// 验证所有配置的Token
+async function validateAllTokens() {
+  console.log(`[Token验证] 开始验证 ${CFG.accounts.length} 个账户的Token...`);
+
+  for (const [index, account] of CFG.accounts.entries()) {
+    console.log(`\n[Token验证] 验证账户 ${index + 1}: ${account.name}`);
+    const validation = await validateToken(account.token, account.name);
+
+    if (!validation.valid) {
+      console.error(`⚠️ [错误] 账户 ${account.name} Token验证失败:`, validation.error);
+      if (validation.httpStatus === 401) {
+        console.error(`ℹ️ 请检查:`);
+        console.error(`   1. Token是否正确（不包含多余空格或特殊字符）`);
+        console.error(`   2. Token是否已过期`);
+        console.error(`   3. Token是否具有 'Analytics:Read' 权限`);
+        console.error(`   4. Token是否具有正确的Zone访问权限`);
+      }
+    } else {
+      console.log(`✓ 账户 ${account.name} Token验证成功，可访问 ${validation.accessibleZones} 个Zone`);
+
+      // 验证具体的Zone访问权限
+      for (const zone of account.zones) {
+        const zoneInfo = await getZoneInfo(account.token, zone.zone_id);
+        if (zoneInfo) {
+          console.log(`  ✓ Zone ${zone.domain} (${zone.zone_id}) 可访问`);
+        } else {
+          console.error(`  ✗ Zone ${zone.domain} (${zone.zone_id}) 不可访问`);
+        }
+      }
+    }
+  }
+  console.log(`\n[Token验证] 验证完成\n`);
+}
 
 // 抓取数据 & 写文件
 async function updateData() {
   try {
     console.log(`[数据更新] 开始更新数据... ${new Date().toLocaleString()}`);
+
+    // 在第一次更新时验证Token
+    if (!updateData.tokenValidated) {
+      await validateAllTokens();
+      updateData.tokenValidated = true;
+    }
+
     const payload = { accounts: [] };
 
     for (const [accIndex, acc] of CFG.accounts.entries()) {

@@ -1,11 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-import LineChart from './components/LineChart';
+import Dashboard from './components/Dashboard';
+import './App.css';
 
 function App() {
   const [accounts, setAccounts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [selectedPeriod, setSelectedPeriod] = useState('3days'); // 单日、3天、7天
 
   useEffect(() => {
     // 使用相对路径，通过nginx反向代理访问
@@ -29,25 +31,30 @@ function App() {
 
   if (loading) {
     return (
-      <div style={{ padding: 32, textAlign: 'center' }}>
-        <h1>Cloudflare 多账户 / 多 Zone 折线图</h1>
-        <p>正在加载数据...</p>
+      <div className="app-container loading">
+        <div className="loading-content">
+          <div className="loading-spinner"></div>
+          <h2>Cloudflare 分析数据</h2>
+          <p>正在加载数据...</p>
+        </div>
       </div>
     );
   }
 
   if (error) {
     return (
-      <div style={{ padding: 32, textAlign: 'center' }}>
-        <h1>Cloudflare 多账户 / 多 Zone 折线图</h1>
-        <div style={{ color: 'red', marginTop: 20 }}>
-          <p>错误: {error}</p>
-          <button 
-            onClick={() => window.location.reload()} 
-            style={{ marginTop: 10, padding: '10px 20px', cursor: 'pointer' }}
-          >
-            重新加载
-          </button>
+      <div className="app-container error">
+        <div className="error-content">
+          <h2>Cloudflare 分析数据</h2>
+          <div className="error-message">
+            <p>⚠️ {error}</p>
+            <button 
+              onClick={() => window.location.reload()} 
+              className="retry-button"
+            >
+              重新加载
+            </button>
+          </div>
         </div>
       </div>
     );
@@ -55,34 +62,22 @@ function App() {
 
   if (!accounts || accounts.length === 0) {
     return (
-      <div style={{ padding: 32, textAlign: 'center' }}>
-        <h1>Cloudflare 多账户 / 多 Zone 折线图</h1>
-        <p>暂无数据，请检查配置或稍后再试。</p>
+      <div className="app-container empty">
+        <div className="empty-content">
+          <h2>Cloudflare 分析数据</h2>
+          <p>暂无数据，请检查配置或稍后再试。</p>
+        </div>
       </div>
     );
   }
 
   return (
-    <div style={{ padding: 32 }}>
-      <h1>Cloudflare 多账户 / 多 Zone 折线图</h1>
-      {accounts.map((acc) => (
-        <div key={acc.name} style={{ marginBottom: 40 }}>
-          <h2 style={{ borderBottom: '2px solid #eee', paddingBottom: 10 }}>
-            账户: {acc.name}
-          </h2>
-          {acc.zones && acc.zones.length > 0 ? (
-            acc.zones.map((z) => (
-              <LineChart
-                key={z.domain}
-                domain={z.domain}
-                raw={z.raw || []}
-              />
-            ))
-          ) : (
-            <p>该账户暂无Zone数据</p>
-          )}
-        </div>
-      ))}
+    <div className="app-container">
+      <Dashboard 
+        accounts={accounts}
+        selectedPeriod={selectedPeriod}
+        onPeriodChange={setSelectedPeriod}
+      />
     </div>
   );
 }
