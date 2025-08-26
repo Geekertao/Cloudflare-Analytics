@@ -353,17 +353,38 @@
   .floating-period-selector {
     left: 10px;
     right: 10px;
-    transform: none;
+    transform: translateX(0);
     width: calc(100% - 20px);
     max-width: none;
-    padding: 8px 12px;
-    gap: 6px;
+    padding: 12px 16px;
+    gap: 8px;
+    justify-content: center;
+  }
+
+  .floating-period-selector:hover {
+    transform: translateX(0) translateY(-2px);
   }
 
   .floating-period-button {
-    padding: 6px 12px;
-    font-size: 12px;
+    padding: 10px 16px;
+    font-size: 13px;
     flex: 1;
     text-align: center;
+    min-height: 44px;
+    min-width: 80px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .floating-period-button:hover {
+    background: rgba(102, 126, 234, 0.1);
+    color: #667eea;
+    transform: none;
+  }
+
+  .floating-period-button.active:hover {
+    background: #5a6fd8;
+    transform: none;
   }
 }
