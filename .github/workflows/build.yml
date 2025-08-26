@@ -95,16 +95,10 @@ jobs:
     needs: build-and-publish
     if: github.event_name != 'pull_request'
     steps:
-      - name: Set image name for security scan
-        id: image-name
-        run: |
-          IMAGE_LOWER=$(echo "${{ env.REGISTRY_GHCR }}/${{ env.IMAGE_NAME }}:latest" | tr '[:upper:]' '[:lower:]')
-          echo "image_ref=$IMAGE_LOWER" >> $GITHUB_OUTPUT
-
       - name: Run Trivy vulnerability scanner
         uses: aquasecurity/trivy-action@master
         with:
-          image-ref: ${{ steps.image-name.outputs.image_ref }}
+          image-ref: ${{ env.REGISTRY_GHCR }}/${{ env.IMAGE_NAME }}:latest
           format: "sarif"
           output: "trivy-results.sarif"
 
