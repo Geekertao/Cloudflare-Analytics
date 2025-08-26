@@ -32,7 +32,7 @@ docker run -p 80:80 \
   -e CF_ZONES="zone_id_1,zone_id_2" \
   -e CF_DOMAINS="example.com,cdn.example.com" \
   -e CF_ACCOUNT_NAME="我的主账户" \
-  cf-analytics
+  geekertao/cloudflare-analytics
 
 # 多账户配置
 docker run -p 80:80 \
@@ -44,12 +44,12 @@ docker run -p 80:80 \
   -e CF_ZONES_2="zone3,zone4" \
   -e CF_DOMAINS_2="site3.com,site4.com" \
   -e CF_ACCOUNT_NAME_2="账户2" \
-  cf-analytics
+  geekertao/cloudflare-analytics
 
 # JSON格式配置
 docker run -p 80:80 \
   -e CF_CONFIG='{"accounts":[{"name":"主账号","token":"your_token","zones":[{"zone_id":"zone1","domain":"example.com"},{"zone_id":"zone2","domain":"cdn.example.com"}]}]}' \
-  cf-analytics
+  geekertao/cloudflare-analytics
 ```
 
 ##### 方式 2: Docker Compose 配置
@@ -109,7 +109,7 @@ docker run -p 80:80 \
   -e CF_TOKENS="your_token" \
   -e CF_ZONES="your_zone_id" \
   -e CF_DOMAINS="your_domain" \
-  cf-analytics
+  cloudflare-analytics
 ```
 
 ### 解决 GitHub Actions 构建问题
@@ -122,7 +122,6 @@ docker run -p 80:80 \
 
 ### 环境变量
 
-- `PORT`: API 端口 (默认: 4000)
 - `NGINX_PORT`: Nginx 端口 (默认: 80)
 
 ## GitHub Actions

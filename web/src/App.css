@@ -125,6 +125,72 @@
   color: white;
 }
 
+/* 浮动按钮组样式 */
+.floating-period-selector {
+  position: fixed;
+  top: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 1000;
+  display: flex;
+  gap: 8px;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  padding: 12px 16px;
+  border-radius: 30px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  animation: slideInFromTop 0.3s ease-out;
+  transition: all 0.3s ease;
+}
+
+.floating-period-selector:hover {
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
+  transform: translateX(-50%) translateY(-2px);
+}
+
+@keyframes slideInFromTop {
+  from {
+    opacity: 0;
+    transform: translateX(-50%) translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+}
+
+.floating-period-button {
+  padding: 8px 16px;
+  border: 2px solid transparent;
+  background: transparent;
+  border-radius: 20px;
+  cursor: pointer;
+  font-weight: 500;
+  font-size: 14px;
+  transition: all 0.3s ease;
+  color: #666;
+  white-space: nowrap;
+}
+
+.floating-period-button:hover {
+  background: rgba(102, 126, 234, 0.1);
+  color: #667eea;
+  transform: scale(1.05);
+}
+
+.floating-period-button.active {
+  background: #667eea;
+  color: white;
+  border-color: #667eea;
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+}
+
+.floating-period-button.active:hover {
+  background: #5a6fd8;
+  transform: scale(1.05);
+}
+
 .stats-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
@@ -281,5 +347,23 @@
   
   .period-selector {
     flex-wrap: wrap;
+  }
+
+  /* 移动端浮动按钮优化 */
+  .floating-period-selector {
+    left: 10px;
+    right: 10px;
+    transform: none;
+    width: calc(100% - 20px);
+    max-width: none;
+    padding: 8px 12px;
+    gap: 6px;
+  }
+
+  .floating-period-button {
+    padding: 6px 12px;
+    font-size: 12px;
+    flex: 1;
+    text-align: center;
   }
 }

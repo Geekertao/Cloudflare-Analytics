@@ -1,9 +1,26 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useEffect, useState } from 'react';
 import StatsCards from './StatsCards';
 import CacheStats from './CacheStats';
 import LineChart from './LineChart';
 
 const Dashboard = ({ accounts, selectedPeriod, onPeriodChange }) => {
+  const [showFloatingButtons, setShowFloatingButtons] = useState(false);
+
+  // 监听滚动事件
+  useEffect(() => {
+    const handleScroll = () => {
+      // 当滚动超过dashboard-header的高度时显示浮动按钮
+      const dashboardHeader = document.querySelector('.dashboard-header');
+      if (dashboardHeader) {
+        const headerBottom = dashboardHeader.offsetTop + dashboardHeader.offsetHeight;
+        setShowFloatingButtons(window.scrollY > headerBottom);
+      }
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
   // 计算汇总数据
   const aggregatedData = useMemo(() => {
     if (!accounts || accounts.length === 0) return null;
@@ -23,8 +40,11 @@ const Dashboard = ({ accounts, selectedPeriod, onPeriodChange }) => {
             .filter(d => d && d.dimensions && d.sum)
             .sort((a, b) => new Date(a.dimensions.date) - new Date(b.dimensions.date));
           
-          const periodData = sortedData.slice(-Math.min(sortedData.length, 
-            selectedPeriod === '1day' ? 1 : selectedPeriod === '3days' ? 3 : 7));
+          const periodDays = selectedPeriod === '1day' ? 1 : 
+                           selectedPeriod === '3days' ? 3 : 
+                           selectedPeriod === '7days' ? 7 : 30;
+          
+          const periodData = sortedData.slice(-Math.min(sortedData.length, periodDays));
           
           periodData.forEach(dayData => {
             if (dayData.sum) {
@@ -81,10 +101,40 @@ const Dashboard = ({ accounts, selectedPeriod, onPeriodChange }) => {
 
   return (
     <div className="dashboard">
+      {/* 浮动按钮组 */}
+      {showFloatingButtons && (
+        <div className="floating-period-selector">
+          <button
+            className={`floating-period-button ${selectedPeriod === '1day' ? 'active' : ''}`}
+            onClick={() => onPeriodChange('1day')}
+          >
+            单日数据
+          </button>
+          <button
+            className={`floating-period-button ${selectedPeriod === '3days' ? 'active' : ''}`}
+            onClick={() => onPeriodChange('3days')}
+          >
+            近3天
+          </button>
+          <button
+            className={`floating-period-button ${selectedPeriod === '7days' ? 'active' : ''}`}
+            onClick={() => onPeriodChange('7days')}
+          >
+            近7天
+          </button>
+          <button
+            className={`floating-period-button ${selectedPeriod === '30days' ? 'active' : ''}`}
+            onClick={() => onPeriodChange('30days')}
+          >
+            近30天
+          </button>
+        </div>
+      )}
+
       {/* 标题区域 */}
       <div className="dashboard-header">
         <h1 className="dashboard-title">Cloudflare 分析数据</h1>
-        <p className="dashboard-subtitle">多账户 / 多Zone 流量分析仪表盘</p>
+        <p className="dashboard-subtitle">Cloudflare流量分析仪表盘</p>
         
         {/* 时间段选择器 */}
         <div className="period-selector">
@@ -105,6 +155,12 @@ const Dashboard = ({ accounts, selectedPeriod, onPeriodChange }) => {
             onClick={() => onPeriodChange('7days')}
           >
             近7天
+          </button>
+          <button
+            className={`period-button ${selectedPeriod === '30days' ? 'active' : ''}`}
+            onClick={() => onPeriodChange('30days')}
+          >
+            近30天
           </button>
         </div>
       </div>
