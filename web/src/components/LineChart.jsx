@@ -9,10 +9,16 @@ import {
   Legend,
   ResponsiveContainer
 } from 'recharts';
+import { useLanguage } from '../contexts/LanguageContext';
 
-const CFLineChart = ({ domain, raw, selectedPeriod }) => {
+const CFLineChart = ({ domain, raw, rawHours, selectedPeriod }) => {
+  const { t } = useLanguage();
+  // 根据时间范围选择数据源：1天和3天使用小时级数据，7天和30天使用天级数据
+  const useHourlyData = selectedPeriod === '1day' || selectedPeriod === '3days';
+  const sourceData = useHourlyData ? rawHours : raw;
+  
   // 数据验证
-  if (!raw || !Array.isArray(raw) || raw.length === 0) {
+  if (!sourceData || !Array.isArray(sourceData) || sourceData.length === 0) {
     return (
       <div style={{ 
         background: 'white',
@@ -35,26 +41,38 @@ const CFLineChart = ({ domain, raw, selectedPeriod }) => {
           textAlign: 'center',
           padding: '40px 0'
         }}>
-          暂无数据或数据格式错误
+          暂无{useHourlyData ? t('noHourlyData').replace('暂无小时级数据或数据格式错误', '') : t('noDailyData').replace('暂无天级数据或数据格式错误', '')}数据或数据格式错误
         </p>
       </div>
     );
   }
 
   // 把API数据转成 Recharts 需要的数据格式
-  const data = raw
+  const data = sourceData
     .filter(d => d && d.dimensions && d.sum) // 过滤无效数据
     .map((d) => {
-      // 格式化日期
-      const date = d.dimensions.date;
-      const formattedDate = new Date(date).toLocaleDateString('zh-CN', {
-        month: 'short',
-        day: 'numeric'
-      });
+      let date, formattedDate, originalDate;
+      
+      if (useHourlyData) {
+        // 小时级数据使用datetimeHour
+        date = d.dimensions.datetimeHour;
+        const dateObj = new Date(date);
+        formattedDate = `${dateObj.getMonth() + 1}/${dateObj.getDate()} ${dateObj.getHours()}:00`;
+        originalDate = date;
+      } else {
+        // 天级数据使用date
+        date = d.dimensions.date;
+        const dateObj = new Date(date);
+        formattedDate = dateObj.toLocaleDateString('zh-CN', {
+          month: 'short',
+          day: 'numeric'
+        });
+        originalDate = date;
+      }
       
       return {
         date: formattedDate,
-        originalDate: date,
+        originalDate: originalDate,
         requests: parseInt(d.sum.requests) || 0,
         bytes: parseInt(d.sum.bytes) || 0,
         threats: parseInt(d.sum.threats) || 0,
@@ -63,10 +81,10 @@ const CFLineChart = ({ domain, raw, selectedPeriod }) => {
       };
     })
     .sort((a, b) => new Date(a.originalDate) - new Date(b.originalDate)) // 按日期排序
-    .slice(-Math.min(raw.length, 
-      selectedPeriod === '1day' ? 1 : 
-      selectedPeriod === '3days' ? 3 : 
-      selectedPeriod === '7days' ? 7 : 30)); // 支持30天数据
+    .slice(-Math.min(sourceData.length, 
+      useHourlyData ? 
+        (selectedPeriod === '1day' ? 24 : 72) : // 1天=24小时，3天=72小时
+        (selectedPeriod === '7days' ? 7 : 30))); // 7天或30天
 
   if (data.length === 0) {
     return (
@@ -91,7 +109,7 @@ const CFLineChart = ({ domain, raw, selectedPeriod }) => {
           textAlign: 'center',
           padding: '40px 0'
         }}>
-          数据格式错误或无有效数据
+          {t('invalidData')}
         </p>
       </div>
     );
@@ -122,7 +140,7 @@ const CFLineChart = ({ domain, raw, selectedPeriod }) => {
           boxShadow: '0 4px 12px rgba(0,0,0,0.1)'
         }}>
           <p style={{ margin: '0 0 8px 0', fontWeight: '600', color: '#333' }}>
-            {`日期: ${label}`}
+            {useHourlyData ? `时间: ${label}` : `日期: ${label}`}
           </p>
           {payload.map((entry, index) => {
             let value = entry.value;
@@ -193,7 +211,10 @@ const CFLineChart = ({ domain, raw, selectedPeriod }) => {
             fontSize: '14px'
           }}>
             数据范围: {data.length > 0 ? 
-              `${data[0].originalDate} 至 ${data[data.length - 1].originalDate}` : 'N/A'}
+              useHourlyData ? 
+                `${new Date(data[0].originalDate).toLocaleString('zh-CN')} 至 ${new Date(data[data.length - 1].originalDate).toLocaleString('zh-CN')}` :
+                `${data[0].originalDate} 至 ${data[data.length - 1].originalDate}` 
+              : 'N/A'}
           </p>
         </div>
         
@@ -208,19 +229,19 @@ const CFLineChart = ({ domain, raw, selectedPeriod }) => {
             <div style={{ fontWeight: '600', color: '#333' }}>
               {formatNumber(totalData.requests)}
             </div>
-            <div>总请求</div>
+            <div>{t('totalRequestsShort')}</div>
           </div>
           <div style={{ textAlign: 'center' }}>
             <div style={{ fontWeight: '600', color: '#333' }}>
               {formatBytes(totalData.bytes)}
             </div>
-            <div>总流量</div>
+            <div>{t('totalTrafficShort')}</div>
           </div>
           <div style={{ textAlign: 'center' }}>
             <div style={{ fontWeight: '600', color: '#667eea' }}>
               {cacheRatio}%
             </div>
-            <div>缓存率</div>
+            <div>{t('cacheRatio')}</div>
           </div>
         </div>
       </div>
@@ -258,7 +279,7 @@ const CFLineChart = ({ domain, raw, selectedPeriod }) => {
             dataKey="requests"
             stroke="#667eea"
             strokeWidth={3}
-            name="请求数"
+            name={t('requests')}
             connectNulls={false}
             dot={{ fill: '#667eea', strokeWidth: 2, r: 4 }}
           />
@@ -269,7 +290,7 @@ const CFLineChart = ({ domain, raw, selectedPeriod }) => {
             stroke="#764ba2"
             strokeWidth={2}
             strokeDasharray="5 5"
-            name="缓存请求数"
+            name={t('cachedRequestsChart')}
             connectNulls={false}
             dot={{ fill: '#764ba2', strokeWidth: 2, r: 3 }}
           />
@@ -279,7 +300,7 @@ const CFLineChart = ({ domain, raw, selectedPeriod }) => {
             dataKey="bytes"
             stroke="#f093fb"
             strokeWidth={3}
-            name="流量"
+            name={t('traffic')}
             connectNulls={false}
             dot={{ fill: '#f093fb', strokeWidth: 2, r: 4 }}
           />
@@ -289,7 +310,7 @@ const CFLineChart = ({ domain, raw, selectedPeriod }) => {
             dataKey="threats"
             stroke="#ff6b6b"
             strokeWidth={2}
-            name="威胁数"
+            name={t('threats')}
             connectNulls={false}
             dot={{ fill: '#ff6b6b', strokeWidth: 2, r: 3 }}
           />

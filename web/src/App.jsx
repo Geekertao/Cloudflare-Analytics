@@ -1,9 +1,19 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import Dashboard from './components/Dashboard';
+import { LanguageProvider, useLanguage } from './contexts/LanguageContext';
 import './App.css';
 
-function App() {
+export default function App() {
+  return (
+    <LanguageProvider>
+      <AppContent />
+    </LanguageProvider>
+  );
+}
+
+function AppContent() {
+  const { t } = useLanguage();
   const [accounts, setAccounts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -20,7 +30,7 @@ function App() {
       })
       .catch((error) => {
         console.error('API Error:', error);
-        setError('无法加载数据，请确保后端API正在运行并已生成数据文件');
+        setError(t('loadError'));
         // 如果数据文件不存在，显示提示信息
         console.log('请确保后端API正在运行并已生成数据文件');
       })
@@ -34,8 +44,8 @@ function App() {
       <div className="app-container loading">
         <div className="loading-content">
           <div className="loading-spinner"></div>
-          <h2>Cloudflare 分析数据</h2>
-          <p>正在加载数据...</p>
+          <h2>{t('dashboardTitle')}</h2>
+          <p>{t('loading')}</p>
         </div>
       </div>
     );
@@ -45,14 +55,14 @@ function App() {
     return (
       <div className="app-container error">
         <div className="error-content">
-          <h2>Cloudflare 分析数据</h2>
+          <h2>{t('dashboardTitle')}</h2>
           <div className="error-message">
             <p>⚠️ {error}</p>
             <button 
               onClick={() => window.location.reload()} 
               className="retry-button"
             >
-              重新加载
+              {t('retry')}
             </button>
           </div>
         </div>
@@ -64,8 +74,8 @@ function App() {
     return (
       <div className="app-container empty">
         <div className="empty-content">
-          <h2>Cloudflare 分析数据</h2>
-          <p>暂无数据，请检查配置或稍后再试。</p>
+          <h2>{t('dashboardTitle')}</h2>
+          <p>{t('noData')}，请检查配置或稍后再试。</p>
         </div>
       </div>
     );
@@ -81,5 +91,3 @@ function App() {
     </div>
   );
 }
-
-export default App;

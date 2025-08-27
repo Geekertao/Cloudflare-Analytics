@@ -1,0 +1,184 @@
+import React, { createContext, useContext, useState, useEffect } from 'react';
+
+// 语言配置
+const languages = {
+    zh: {
+        // Dashboard
+        dashboardTitle: 'Cloudflare 分析数据',
+        dashboardSubtitle: 'Cloudflare流量分析仪表盘',
+        noData: '暂无数据',
+
+        // Period Selector
+        singleDay: '单日数据',
+        threeDays: '近3天',
+        sevenDays: '近7天',
+        thirtyDays: '近30天',
+
+        // Stats Cards
+        totalRequests: '总请求数',
+        totalTraffic: '总流量',
+        totalThreats: '总威胁数',
+
+        // Cache Stats
+        requestCacheStats: '请求缓存统计',
+        bandwidthCacheStats: '带宽缓存统计',
+        cachedRequests: '已缓存请求',
+        uncachedRequests: '未缓存请求',
+        cachedBandwidth: '已缓存带宽',
+        uncachedBandwidth: '未缓存带宽',
+
+        // Chart
+        webTrafficTrends: 'Web 流量趋势',
+        account: '账户',
+        noZoneData: '该账户暂无Zone数据',
+        dataRange: '数据范围',
+        totalRequestsShort: '总请求',
+        totalTrafficShort: '总流量',
+        cacheRatio: '缓存率',
+        noHourlyData: '暂无小时级数据或数据格式错误',
+        noDailyData: '暂无天级数据或数据格式错误',
+        invalidData: '数据格式错误或无有效数据',
+
+        // Chart Labels
+        requests: '请求数',
+        cachedRequestsChart: '缓存请求数',
+        traffic: '流量',
+        threats: '威胁数',
+        date: '日期',
+        time: '时间',
+
+        // Loading & Error
+        loading: '正在加载数据...',
+        loadError: '无法加载数据，请确保后端API正在运行并已生成数据文件',
+        retry: '重新加载',
+
+        // Footer
+        poweredBy: 'Powered by',
+
+        // Language Switch
+        language: '语言',
+        chinese: '中文',
+        english: 'English',
+
+        // Geography Stats
+        geographyStats: '地理位置统计',
+        topCountriesRegions: '访问量前5的国家和地区',
+        requestsByCountry: '各国家/地区请求数量',
+        detailedStats: '详细统计',
+        countryRegion: '国家/地区',
+        noGeographyData: '暂无地理位置数据'
+    },
+    en: {
+        // Dashboard
+        dashboardTitle: 'Cloudflare Analytics',
+        dashboardSubtitle: 'Cloudflare Traffic Analytics Dashboard',
+        noData: 'No Data Available',
+
+        // Period Selector
+        singleDay: '1 Day',
+        threeDays: '3 Days',
+        sevenDays: '7 Days',
+        thirtyDays: '30 Days',
+
+        // Stats Cards
+        totalRequests: 'Total Requests',
+        totalTraffic: 'Total Traffic',
+        totalThreats: 'Total Threats',
+
+        // Cache Stats
+        requestCacheStats: 'Request Cache Statistics',
+        bandwidthCacheStats: 'Bandwidth Cache Statistics',
+        cachedRequests: 'Cached Requests',
+        uncachedRequests: 'Uncached Requests',
+        cachedBandwidth: 'Cached Bandwidth',
+        uncachedBandwidth: 'Uncached Bandwidth',
+
+        // Chart
+        webTrafficTrends: 'Web Traffic Trends',
+        account: 'Account',
+        noZoneData: 'No Zone data available for this account',
+        dataRange: 'Data Range',
+        totalRequestsShort: 'Total Requests',
+        totalTrafficShort: 'Total Traffic',
+        cacheRatio: 'Cache Ratio',
+        noHourlyData: 'No hourly data available or data format error',
+        noDailyData: 'No daily data available or data format error',
+        invalidData: 'Data format error or no valid data',
+
+        // Chart Labels
+        requests: 'Requests',
+        cachedRequestsChart: 'Cached Requests',
+        traffic: 'Traffic',
+        threats: 'Threats',
+        date: 'Date',
+        time: 'Time',
+
+        // Loading & Error
+        loading: 'Loading data...',
+        loadError: 'Unable to load data. Please ensure the backend API is running and data files are generated',
+        retry: 'Retry',
+
+        // Footer
+        poweredBy: 'Powered by',
+
+        // Language Switch
+        language: 'Language',
+        chinese: '中文',
+        english: 'English',
+
+        // Geography Stats
+        geographyStats: 'Geography Statistics',
+        topCountriesRegions: 'Top 5 Countries and Regions by Traffic',
+        requestsByCountry: 'Requests by Country/Region',
+        detailedStats: 'Detailed Statistics',
+        countryRegion: 'Country/Region',
+        noGeographyData: 'No geography data available'
+    }
+};
+
+const LanguageContext = createContext();
+
+export const LanguageProvider = ({ children }) => {
+    const [currentLanguage, setCurrentLanguage] = useState(() => {
+        // 从localStorage获取保存的语言设置，默认为中文
+        return localStorage.getItem('cf-analytics-language') || 'zh';
+    });
+
+    const switchLanguage = (lang) => {
+        setCurrentLanguage(lang);
+        localStorage.setItem('cf-analytics-language', lang);
+    };
+
+    const t = (key) => {
+        return languages[currentLanguage]?.[key] || key;
+    };
+
+    useEffect(() => {
+        // 更新页面标题
+        document.title = currentLanguage === 'zh' ?
+            'Cloudflare 分析数据 - 流量分析仪表盘' :
+            'Cloudflare Analytics - Traffic Analytics Dashboard';
+    }, [currentLanguage]);
+
+    return (
+        <LanguageContext.Provider value={{
+            currentLanguage,
+            switchLanguage,
+            t,
+            isZh: currentLanguage === 'zh',
+            isEn: currentLanguage === 'en'
+        }}>
+            {children}
+        </LanguageContext.Provider>
+    );
+};
+
+export const useLanguage = () => {
+    const context = useContext(LanguageContext);
+    if (!context) {
+        throw new Error('useLanguage must be used within a LanguageProvider');
+    }
+    return context;
+};
+
+export default LanguageContext;

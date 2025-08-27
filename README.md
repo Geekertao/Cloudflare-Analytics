@@ -2,12 +2,18 @@
 
 多账户、多 Zone 的 Cloudflare 流量分析仪表盘
 
+中文 | [English](./README_EN.md)
+
 ## 功能特性
 
 - 支持多个 Cloudflare 账户
 - 多 Zone 流量监控
 - 实时数据图表展示
 - 30 天历史数据分析
+- 单日和三日数据支持小时级精度
+- 七天和三十天数据支持天级精度
+- 多语言支持（中文/英文）
+- **地理位置统计**：柱状图和列表显示前 5 个国家/地区的访问统计
 
 ## 技术栈
 
@@ -109,8 +115,25 @@ docker run -p 80:80 \
   -e CF_TOKENS="your_token" \
   -e CF_ZONES="your_zone_id" \
   -e CF_DOMAINS="your_domain" \
-  cloudflare-analytics
+  cf-analytics
 ```
+
+### Cloudflare API Token 配置
+
+要使用此仪表盘，您需要创建一个具有以下权限的 Cloudflare API Token：
+
+1. **Account | Analytics | Read**
+2. **Zone | Analytics | Read**
+3. **Zone | Zone | Read**
+
+您可以在此处创建 Token：https://dash.cloudflare.com/profile/api-tokens
+
+### 数据更新频率
+
+- 后端数据更新：**每 2 小时更新一次**
+- 数据精度：
+  - **单日和三日数据**：小时级精度（最多 168 个数据点）
+  - **七天和三十天数据**：天级精度（最多 45 个数据点）
 
 ### 解决 GitHub Actions 构建问题
 
@@ -123,16 +146,47 @@ docker run -p 80:80 \
 ### 环境变量
 
 - `NGINX_PORT`: Nginx 端口 (默认: 80)
+- `CF_TOKENS`: Cloudflare API 令牌（单账户用逗号分隔）
+- `CF_ZONES`: Zone ID（逗号分隔）
+- `CF_DOMAINS`: 域名（逗号分隔）
+- `CF_ACCOUNT_NAME`: 账户显示名称
+
+## 功能概览
+
+### 多语言支持
+
+- 支持中文和英文界面
+- 语言偏好本地保存
+- 实时语言切换
+
+### 数据可视化
+
+- **统计卡片**：总请求数、总流量、总威胁数
+- **缓存分析**：请求和带宽缓存统计，配有饼状图
+- **流量趋势**：显示小时/天级趋势的折线图
+- **响应式设计**：完美适配桌面端和移动端
+
+### 时间范围选择
+
+- **单日数据**：小时级数据（24 个数据点）
+- **三日数据**：小时级数据（72 个数据点）
+- **七日数据**：天级数据（7 个数据点）
+- **三十日数据**：天级数据（30 个数据点）
 
 ## GitHub Actions
 
-本项目使用 GitHub Actions 自动构建并推送 Docker 镜像到 GitHub Container Registry。
+本项目使用 GitHub Actions 自动构建并推送 Docker 镜像到 GitHub Container Registry 和 Docker Hub。
 
 构建触发条件：
 
 - 推送到 `main` 或 `master` 分支
 - 创建 Pull Request
 - 手动触发
+
+所需的 GitHub Secrets：
+
+- `DOCKERHUB_USERNAME`: Docker Hub 用户名
+- `DOCKERHUB_TOKEN`: Docker Hub 访问令牌
 
 ## 项目结构
 

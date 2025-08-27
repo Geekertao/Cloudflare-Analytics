@@ -1,9 +1,13 @@
 import React, { useMemo, useEffect, useState } from 'react';
 import StatsCards from './StatsCards';
 import CacheStats from './CacheStats';
+import GeographyStats from './GeographyStats';
 import LineChart from './LineChart';
+import LanguageSwitch from './LanguageSwitch';
+import { useLanguage } from '../contexts/LanguageContext';
 
 const Dashboard = ({ accounts, selectedPeriod, onPeriodChange }) => {
+  const { t } = useLanguage();
   const [showFloatingButtons, setShowFloatingButtons] = useState(false);
 
   // 监听滚动事件
@@ -34,25 +38,40 @@ const Dashboard = ({ accounts, selectedPeriod, onPeriodChange }) => {
 
     accounts.forEach(account => {
       account.zones?.forEach(zone => {
-        if (zone.raw && Array.isArray(zone.raw)) {
-          // 根据selectedPeriod过滤数据，只统计最新的N天
-          const sortedData = zone.raw
+        // 根据时间范围选择数据源：1天和3天使用小时级数据，7天和30天使用天级数据
+        const useHourlyData = selectedPeriod === '1day' || selectedPeriod === '3days';
+        const rawData = useHourlyData ? (zone.rawHours || []) : (zone.raw || []);
+        
+        if (rawData && Array.isArray(rawData)) {
+          // 排序数据
+          const sortedData = rawData
             .filter(d => d && d.dimensions && d.sum)
-            .sort((a, b) => new Date(a.dimensions.date) - new Date(b.dimensions.date));
+            .sort((a, b) => {
+              if (useHourlyData) {
+                return new Date(a.dimensions.datetimeHour) - new Date(b.dimensions.datetimeHour);
+              } else {
+                return new Date(a.dimensions.date) - new Date(b.dimensions.date);
+              }
+            });
           
-          const periodDays = selectedPeriod === '1day' ? 1 : 
-                           selectedPeriod === '3days' ? 3 : 
-                           selectedPeriod === '7days' ? 7 : 30;
+          let periodData;
+          if (useHourlyData) {
+            // 小时级数据：1天=24小时，3天=72小时
+            const periodHours = selectedPeriod === '1day' ? 24 : 72;
+            periodData = sortedData.slice(-Math.min(sortedData.length, periodHours));
+          } else {
+            // 天级数据：7天或30天
+            const periodDays = selectedPeriod === '7days' ? 7 : 30;
+            periodData = sortedData.slice(-Math.min(sortedData.length, periodDays));
+          }
           
-          const periodData = sortedData.slice(-Math.min(sortedData.length, periodDays));
-          
-          periodData.forEach(dayData => {
-            if (dayData.sum) {
-              totalRequests += parseInt(dayData.sum.requests) || 0;
-              totalBytes += parseInt(dayData.sum.bytes) || 0;
-              totalThreats += parseInt(dayData.sum.threats) || 0;
-              totalCachedRequests += parseInt(dayData.sum.cachedRequests) || 0;
-              totalCachedBytes += parseInt(dayData.sum.cachedBytes) || 0;
+          periodData.forEach(dataPoint => {
+            if (dataPoint.sum) {
+              totalRequests += parseInt(dataPoint.sum.requests) || 0;
+              totalBytes += parseInt(dataPoint.sum.bytes) || 0;
+              totalThreats += parseInt(dataPoint.sum.threats) || 0;
+              totalCachedRequests += parseInt(dataPoint.sum.cachedRequests) || 0;
+              totalCachedBytes += parseInt(dataPoint.sum.cachedBytes) || 0;
             }
           });
           
@@ -92,11 +111,14 @@ const Dashboard = ({ accounts, selectedPeriod, onPeriodChange }) => {
     return (
       <div className="dashboard">
         <div className="dashboard-header">
-          <h1 className="dashboard-title">
-            <img src="/favicon.svg" alt="Cloudflare" className="dashboard-icon" />
-            Cloudflare 分析数据
-          </h1>
-          <p className="dashboard-subtitle">暂无数据</p>
+          <div className="header-top">
+            <h1 className="dashboard-title">
+              <img src="/favicon.svg" alt="Cloudflare" className="dashboard-icon" />
+              {t('dashboardTitle')}
+            </h1>
+            <LanguageSwitch />
+          </div>
+          <p className="dashboard-subtitle">{t('noData')}</p>
         </div>
       </div>
     );
@@ -111,36 +133,39 @@ const Dashboard = ({ accounts, selectedPeriod, onPeriodChange }) => {
             className={`floating-period-button ${selectedPeriod === '1day' ? 'active' : ''}`}
             onClick={() => onPeriodChange('1day')}
           >
-            单日数据
+            {t('singleDay')}
           </button>
           <button
             className={`floating-period-button ${selectedPeriod === '3days' ? 'active' : ''}`}
             onClick={() => onPeriodChange('3days')}
           >
-            近3天
+            {t('threeDays')}
           </button>
           <button
             className={`floating-period-button ${selectedPeriod === '7days' ? 'active' : ''}`}
             onClick={() => onPeriodChange('7days')}
           >
-            近7天
+            {t('sevenDays')}
           </button>
           <button
             className={`floating-period-button ${selectedPeriod === '30days' ? 'active' : ''}`}
             onClick={() => onPeriodChange('30days')}
           >
-            近30天
+            {t('thirtyDays')}
           </button>
         </div>
       )}
 
       {/* 标题区域 */}
       <div className="dashboard-header">
-        <h1 className="dashboard-title">
-          <img src="/favicon.svg" alt="Cloudflare" className="dashboard-icon" />
-          Cloudflare 分析数据
-        </h1>
-        <p className="dashboard-subtitle">Cloudflare流量分析仪表盘</p>
+        <div className="header-top">
+          <h1 className="dashboard-title">
+            <img src="/favicon.svg" alt="Cloudflare" className="dashboard-icon" />
+            {t('dashboardTitle')}
+          </h1>
+          <LanguageSwitch />
+        </div>
+        <p className="dashboard-subtitle">{t('dashboardSubtitle')}</p>
         
         {/* 时间段选择器 */}
         <div className="period-selector">
@@ -148,25 +173,25 @@ const Dashboard = ({ accounts, selectedPeriod, onPeriodChange }) => {
             className={`period-button ${selectedPeriod === '1day' ? 'active' : ''}`}
             onClick={() => onPeriodChange('1day')}
           >
-            单日数据
+            {t('singleDay')}
           </button>
           <button
             className={`period-button ${selectedPeriod === '3days' ? 'active' : ''}`}
             onClick={() => onPeriodChange('3days')}
           >
-            近3天
+            {t('threeDays')}
           </button>
           <button
             className={`period-button ${selectedPeriod === '7days' ? 'active' : ''}`}
             onClick={() => onPeriodChange('7days')}
           >
-            近7天
+            {t('sevenDays')}
           </button>
           <button
             className={`period-button ${selectedPeriod === '30days' ? 'active' : ''}`}
             onClick={() => onPeriodChange('30days')}
           >
-            近30天
+            {t('thirtyDays')}
           </button>
         </div>
       </div>
@@ -192,13 +217,20 @@ const Dashboard = ({ accounts, selectedPeriod, onPeriodChange }) => {
         formatBytes={formatBytes}
       />
 
+      {/* 地理位置统计 */}
+      <GeographyStats
+        data={accounts}
+        formatNumber={formatNumber}
+        formatBytes={formatBytes}
+      />
+
       {/* 图表区域 */}
       <div className="charts-section">
-        <h2 className="section-title">Web 流量趋势</h2>
+        <h2 className="section-title">{t('webTrafficTrends')}</h2>
         {accounts.map((account) => (
           <div key={account.name} className="account-section">
             <div className="account-header">
-              <h3 className="account-name">账户: {account.name}</h3>
+              <h3 className="account-name">{t('account')}: {account.name}</h3>
             </div>
             <div className="zones-grid">
               {account.zones && account.zones.length > 0 ? (
@@ -207,6 +239,7 @@ const Dashboard = ({ accounts, selectedPeriod, onPeriodChange }) => {
                     key={zone.domain}
                     domain={zone.domain}
                     raw={zone.raw || []}
+                    rawHours={zone.rawHours || []}
                     selectedPeriod={selectedPeriod}
                   />
                 ))
@@ -218,7 +251,7 @@ const Dashboard = ({ accounts, selectedPeriod, onPeriodChange }) => {
                   textAlign: 'center',
                   color: '#666'
                 }}>
-                  该账户暂无Zone数据
+                  {t('noZoneData')}
                 </div>
               )}
             </div>
@@ -229,7 +262,7 @@ const Dashboard = ({ accounts, selectedPeriod, onPeriodChange }) => {
       {/* 页面底部 Powered by */}
       <div className="powered-by-section">
         <div className="powered-by-content">
-          <p className="powered-by-text">Powered by</p>
+          <p className="powered-by-text">{t('poweredBy')}</p>
           <div className="powered-by-badges">
             <a href="https://github.com/Geekertao/Cloudflare-Analytics"><img src="https://img.shields.io/badge/Cloudflare%20Analytics-Dashboard-F38020?style=for-the-badge&logo=cloudflare&logoColor=white" alt="Cloudflare Analytics" />
             </a>

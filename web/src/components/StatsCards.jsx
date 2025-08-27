@@ -1,19 +1,21 @@
 import React from 'react';
+import { useLanguage } from '../contexts/LanguageContext';
 
 const StatsCards = ({ totalRequests, totalBytes, totalThreats, formatNumber, formatBytes }) => {
+  const { t } = useLanguage();
   const stats = [
     {
-      label: '总请求数',
+      label: t('totalRequests'),
       value: formatNumber(totalRequests),
       icon: '📊'
     },
     {
-      label: '总带宽使用',
+      label: t('totalTraffic'),
       value: formatBytes(totalBytes),
       icon: '📈'
     },
     {
-      label: '威胁请求数',
+      label: t('totalThreats'),
       value: formatNumber(totalThreats),
       icon: '🛡️'
     },

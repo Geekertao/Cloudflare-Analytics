@@ -1,7 +1,7 @@
 {
   "accounts": [
     {
-      "name": "主账户",
+      "name": "测试账户,出现此说明配置错误",
       "zones": [
         {
           "domain": "example.com",

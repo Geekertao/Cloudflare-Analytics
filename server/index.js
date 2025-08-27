@@ -252,13 +252,14 @@ async function updateData() {
       for (const [zoneIndex, z] of acc.zones.entries()) {
         try {
           console.log(`    处理 Zone ${zoneIndex + 1}/${acc.zones.length}: ${z.domain}`);
-          // 获取更大的时间范围以确保有足够的最新数据
-          const since = new Date(Date.now() - 45 * 24 * 60 * 60 * 1000).toISOString().slice(0, 10); // 45天前
-          const until = new Date().toISOString().slice(0, 10); // 今天
 
-          console.log(`    查询时间范围: ${since} 到 ${until}`);
+          // 获取天级数据（用于7天和30天显示）
+          const daysSince = new Date(Date.now() - 45 * 24 * 60 * 60 * 1000).toISOString().slice(0, 10); // 45天前
+          const daysUntil = new Date().toISOString().slice(0, 10); // 今天
 
-          const query = `
+          console.log(`    查询天级数据时间范围: ${daysSince} 到 ${daysUntil}`);
+
+          const daysQuery = `
             query($zone: String!, $since: Date!, $until: Date!) {
               viewer {
                 zones(filter: {zoneTag: $zone}) {
@@ -282,45 +283,160 @@ async function updateData() {
               }
             }`;
 
-          const res = await axios.post(
-            'https://api.cloudflare.com/client/v4/graphql',
-            { query, variables: { zone: z.zone_id, since, until } },
-            {
-              headers: {
-                'Authorization': `Bearer ${acc.token}`,
-                'Content-Type': 'application/json'
-              },
-              timeout: 30000
-            }
-          );
+          // 获取小时级数据（用于1天和3天显示）
+          const hoursSince = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString(); // 7天前
+          const hoursUntil = new Date().toISOString(); // 现在
 
-          if (res.data.errors) {
-            console.error(`    Zone ${z.domain} API错误:`, res.data.errors);
-            accData.zones.push({
-              domain: z.domain,
-              raw: [],
-              error: res.data.errors[0]?.message || 'API请求失败'
-            });
-          } else if (res.data.data?.viewer?.zones?.[0]?.httpRequests1dGroups) {
-            const rawData = res.data.data.viewer.zones[0].httpRequests1dGroups;
-            console.log(`    Zone ${z.domain} 数据获取成功: ${rawData.length} 条记录`);
+          console.log(`    查询小时级数据时间范围: ${hoursSince} 到 ${hoursUntil}`);
 
-            // 打印最新的几条数据的日期，便于调试
+          const hoursQuery = `
+            query($zone: String!, $since: Time!, $until: Time!) {
+              viewer {
+                zones(filter: {zoneTag: $zone}) {
+                  httpRequests1hGroups(
+                    filter: {datetime_geq: $since, datetime_leq: $until}
+                    limit: 200
+                    orderBy: [datetime_DESC]
+                  ) {
+                    dimensions {
+                      datetimeHour
+                    }
+                    sum {
+                      requests
+                      bytes
+                      threats
+                      cachedRequests
+                      cachedBytes
+                    }
+                  }
+                }
+              }
+            }`;
+
+          // 获取地理位置数据（过去7天）
+          const geoSince = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString().slice(0, 10); // 7天前
+          const geoUntil = new Date().toISOString().slice(0, 10); // 今天
+
+          console.log(`    查询地理位置数据时间范围: ${geoSince} 到 ${geoUntil}`);
+
+          const geoQuery = `
+            query($zone: String!, $since: Date!, $until: Date!) {
+              viewer {
+                zones(filter: {zoneTag: $zone}) {
+                  httpRequestsAdaptiveGroups(
+                    filter: {date_geq: $since, date_leq: $until}
+                    limit: 15
+                    orderBy: [sum_requests_DESC]
+                  ) {
+                    dimensions {
+                      clientCountryName
+                    }
+                    sum {
+                      requests
+                      bytes
+                      threats
+                    }
+                  }
+                }
+              }
+            }`;
+
+          // 并行获取天级、小时级和地理位置数据
+          const [daysRes, hoursRes, geoRes] = await Promise.all([
+            axios.post(
+              'https://api.cloudflare.com/client/v4/graphql',
+              { query: daysQuery, variables: { zone: z.zone_id, since: daysSince, until: daysUntil } },
+              {
+                headers: {
+                  'Authorization': `Bearer ${acc.token}`,
+                  'Content-Type': 'application/json'
+                },
+                timeout: 30000
+              }
+            ),
+            axios.post(
+              'https://api.cloudflare.com/client/v4/graphql',
+              { query: hoursQuery, variables: { zone: z.zone_id, since: hoursSince, until: hoursUntil } },
+              {
+                headers: {
+                  'Authorization': `Bearer ${acc.token}`,
+                  'Content-Type': 'application/json'
+                },
+                timeout: 30000
+              }
+            ),
+            axios.post(
+              'https://api.cloudflare.com/client/v4/graphql',
+              { query: geoQuery, variables: { zone: z.zone_id, since: geoSince, until: geoUntil } },
+              {
+                headers: {
+                  'Authorization': `Bearer ${acc.token}`,
+                  'Content-Type': 'application/json'
+                },
+                timeout: 30000
+              }
+            )
+          ]);
+
+          const zoneData = { domain: z.domain, raw: [], rawHours: [], geography: [] };
+
+          // 处理天级数据
+          if (daysRes.data.errors) {
+            console.error(`    Zone ${z.domain} 天级数据API错误:`, daysRes.data.errors);
+            zoneData.error = daysRes.data.errors[0]?.message || '天级数据API请求失败';
+          } else if (daysRes.data.data?.viewer?.zones?.[0]?.httpRequests1dGroups) {
+            const rawData = daysRes.data.data.viewer.zones[0].httpRequests1dGroups;
+            console.log(`    Zone ${z.domain} 天级数据获取成功: ${rawData.length} 条记录`);
+            zoneData.raw = rawData;
+
             if (rawData.length > 0) {
               const latestDates = rawData.slice(0, 3).map(d => d.dimensions.date);
-              console.log(`    最新数据日期: ${latestDates.join(', ')}`);
+              console.log(`    最新天级数据日期: ${latestDates.join(', ')}`);
             }
-
-            accData.zones.push({ domain: z.domain, raw: rawData });
-          } else {
-            console.warn(`    Zone ${z.domain} 返回数据为空`);
-            accData.zones.push({ domain: z.domain, raw: [] });
           }
+
+          // 处理小时级数据
+          if (hoursRes.data.errors) {
+            console.error(`    Zone ${z.domain} 小时级数据API错误:`, hoursRes.data.errors);
+            if (!zoneData.error) {
+              zoneData.error = hoursRes.data.errors[0]?.message || '小时级数据API请求失败';
+            }
+          } else if (hoursRes.data.data?.viewer?.zones?.[0]?.httpRequests1hGroups) {
+            const rawHoursData = hoursRes.data.data.viewer.zones[0].httpRequests1hGroups;
+            console.log(`    Zone ${z.domain} 小时级数据获取成功: ${rawHoursData.length} 条记录`);
+            zoneData.rawHours = rawHoursData;
+
+            if (rawHoursData.length > 0) {
+              const latestHours = rawHoursData.slice(0, 3).map(d => d.dimensions.datetimeHour);
+              console.log(`    最新小时级数据时间: ${latestHours.join(', ')}`);
+            }
+          }
+
+          // 处理地理位置数据
+          if (geoRes.data.errors) {
+            console.error(`    Zone ${z.domain} 地理位置数据API错误:`, geoRes.data.errors);
+            if (!zoneData.error) {
+              zoneData.error = geoRes.data.errors[0]?.message || '地理位置数据API请求失败';
+            }
+          } else if (geoRes.data.data?.viewer?.zones?.[0]?.httpRequestsAdaptiveGroups) {
+            const rawGeoData = geoRes.data.data.viewer.zones[0].httpRequestsAdaptiveGroups;
+            console.log(`    Zone ${z.domain} 地理位置数据获取成功: ${rawGeoData.length} 条记录`);
+            zoneData.geography = rawGeoData;
+
+            if (rawGeoData.length > 0) {
+              const topCountries = rawGeoData.slice(0, 5).map(d => `${d.dimensions.clientCountryName}: ${d.sum.requests}`);
+              console.log(`    前5个国家/地区: ${topCountries.join(', ')}`);
+            }
+          }
+
+          accData.zones.push(zoneData);
         } catch (error) {
           console.error(`    Zone ${z.domain} 处理失败:`, error.message);
           accData.zones.push({
             domain: z.domain,
             raw: [],
+            rawHours: [],
+            geography: [],
             error: error.message
           });
         }
