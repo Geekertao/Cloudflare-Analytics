@@ -299,7 +299,7 @@ async function updateData() {
                     orderBy: [datetime_DESC]
                   ) {
                     dimensions {
-                      datetimeHour
+                      datetime
                     }
                     sum {
                       requests
@@ -326,7 +326,6 @@ async function updateData() {
                   httpRequestsAdaptiveGroups(
                     filter: {date_geq: $since, date_leq: $until}
                     limit: 15
-                    orderBy: [sum_requests_DESC]
                   ) {
                     dimensions {
                       clientCountryName
@@ -407,7 +406,7 @@ async function updateData() {
             zoneData.rawHours = rawHoursData;
 
             if (rawHoursData.length > 0) {
-              const latestHours = rawHoursData.slice(0, 3).map(d => d.dimensions.datetimeHour);
+              const latestHours = rawHoursData.slice(0, 3).map(d => d.dimensions.datetime);
               console.log(`    最新小时级数据时间: ${latestHours.join(', ')}`);
             }
           }

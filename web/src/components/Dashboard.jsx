@@ -48,7 +48,7 @@ const Dashboard = ({ accounts, selectedPeriod, onPeriodChange }) => {
             .filter(d => d && d.dimensions && d.sum)
             .sort((a, b) => {
               if (useHourlyData) {
-                return new Date(a.dimensions.datetimeHour) - new Date(b.dimensions.datetimeHour);
+                return new Date(a.dimensions.datetime) - new Date(b.dimensions.datetime);
               } else {
                 return new Date(a.dimensions.date) - new Date(b.dimensions.date);
               }

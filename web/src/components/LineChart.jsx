@@ -54,8 +54,8 @@ const CFLineChart = ({ domain, raw, rawHours, selectedPeriod }) => {
       let date, formattedDate, originalDate;
       
       if (useHourlyData) {
-        // 小时级数据使用datetimeHour
-        date = d.dimensions.datetimeHour;
+        // 小时级数据使用datetime
+        date = d.dimensions.datetime;
         const dateObj = new Date(date);
         formattedDate = `${dateObj.getMonth() + 1}/${dateObj.getDate()} ${dateObj.getHours()}:00`;
         originalDate = date;
