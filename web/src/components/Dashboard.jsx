@@ -42,6 +42,17 @@ const Dashboard = ({ accounts, selectedPeriod, onPeriodChange }) => {
         const useHourlyData = selectedPeriod === '1day' || selectedPeriod === '3days';
         const rawData = useHourlyData ? (zone.rawHours || []) : (zone.raw || []);
         
+        // 添加数据验证和错误处理
+        if (!rawData || !Array.isArray(rawData) || rawData.length === 0) {
+          console.warn(`Zone ${zone.domain}: 缺少${useHourlyData ? '小时级' : '天级'}数据`);
+          allZonesData.push({
+            ...zone,
+            accountName: account.name,
+            dataError: `缺少${useHourlyData ? '小时级' : '天级'}数据`
+          });
+          return;
+        }
+        
         if (rawData && Array.isArray(rawData)) {
           // 排序数据
           const sortedData = rawData
@@ -217,8 +228,10 @@ const Dashboard = ({ accounts, selectedPeriod, onPeriodChange }) => {
         formatBytes={formatBytes}
       />
 
-      {/* 地理位置统计 - 仅在单日数据时显示 */}
-      {selectedPeriod === '1day' && (
+      {/* 地理位置统计 - 仅在单日数据时显示且有地理位置数据 */}
+      {selectedPeriod === '1day' && accounts && accounts.some(account => 
+        account.zones && account.zones.some(zone => zone.geography && zone.geography.length > 0)
+      ) && (
         <GeographyStats
           data={accounts}
           formatNumber={formatNumber}

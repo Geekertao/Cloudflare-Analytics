@@ -42,6 +42,76 @@
                 "cachedBytes": 3800000000
               }
             }
+          ],
+          "rawHours": [
+            {
+              "dimensions": {
+                "datetime": "2024-01-17T10:00:00Z"
+              },
+              "sum": {
+                "requests": 5960,
+                "bytes": 274000000,
+                "threats": 67,
+                "cachedRequests": 5664,
+                "cachedBytes": 158000000
+              }
+            },
+            {
+              "dimensions": {
+                "datetime": "2024-01-17T11:00:00Z"
+              },
+              "sum": {
+                "requests": 6120,
+                "bytes": 285000000,
+                "threats": 72,
+                "cachedRequests": 5814,
+                "cachedBytes": 164000000
+              }
+            },
+            {
+              "dimensions": {
+                "datetime": "2024-01-17T12:00:00Z"
+              },
+              "sum": {
+                "requests": 6430,
+                "bytes": 301000000,
+                "threats": 78,
+                "cachedRequests": 6109,
+                "cachedBytes": 173000000
+              }
+            }
+          ],
+          "geography": [
+            {
+              "count": 45620,
+              "dimensions": {
+                "clientCountryName": "China"
+              }
+            },
+            {
+              "count": 23890,
+              "dimensions": {
+                "clientCountryName": "United States"
+              }
+            },
+            {
+              "count": 12340,
+              "dimensions": {
+                "clientCountryName": "Japan"
+              }
+            },
+            {
+              "count": 8760,
+              "dimensions": {
+                "clientCountryName": "Germany"
+              }
+            },
+            {
+              "count": 6540,
+              "dimensions": {
+                "clientCountryName": "United Kingdom"
+              }
+            }
           ]
         },
         {
@@ -81,6 +151,76 @@
                 "threats": 701,
                 "cachedRequests": 97890,
                 "cachedBytes": 3500000000
+              }
+            }
+          ],
+          "rawHours": [
+            {
+              "dimensions": {
+                "datetime": "2024-01-17T10:00:00Z"
+              },
+              "sum": {
+                "requests": 4260,
+                "bytes": 162000000,
+                "threats": 29,
+                "cachedRequests": 4074,
+                "cachedBytes": 146000000
+              }
+            },
+            {
+              "dimensions": {
+                "datetime": "2024-01-17T11:00:00Z"
+              },
+              "sum": {
+                "requests": 4480,
+                "bytes": 175000000,
+                "threats": 32,
+                "cachedRequests": 4288,
+                "cachedBytes": 158000000
+              }
+            },
+            {
+              "dimensions": {
+                "datetime": "2024-01-17T12:00:00Z"
+              },
+              "sum": {
+                "requests": 4720,
+                "bytes": 189000000,
+                "threats": 36,
+                "cachedRequests": 4514,
+                "cachedBytes": 171000000
+              }
+            }
+          ],
+          "geography": [
+            {
+              "count": 32140,
+              "dimensions": {
+                "clientCountryName": "China"
+              }
+            },
+            {
+              "count": 18960,
+              "dimensions": {
+                "clientCountryName": "United States"
+              }
+            },
+            {
+              "count": 9830,
+              "dimensions": {
+                "clientCountryName": "South Korea"
+              }
+            },
+            {
+              "count": 7220,
+              "dimensions": {
+                "clientCountryName": "Singapore"
+              }
+            },
+            {
+              "count": 5940,
+              "dimensions": {
+                "clientCountryName": "Australia"
               }
             }
           ]
@@ -127,6 +267,76 @@
                 "threats": 298,
                 "cachedRequests": 63450,
                 "cachedBytes": 2000000000
+              }
+            }
+          ],
+          "rawHours": [
+            {
+              "dimensions": {
+                "datetime": "2024-01-17T10:00:00Z"
+              },
+              "sum": {
+                "requests": 2830,
+                "bytes": 97000000,
+                "threats": 12,
+                "cachedRequests": 2647,
+                "cachedBytes": 81000000
+              }
+            },
+            {
+              "dimensions": {
+                "datetime": "2024-01-17T11:00:00Z"
+              },
+              "sum": {
+                "requests": 2950,
+                "bytes": 104000000,
+                "threats": 14,
+                "cachedRequests": 2757,
+                "cachedBytes": 87000000
+              }
+            },
+            {
+              "dimensions": {
+                "datetime": "2024-01-17T12:00:00Z"
+              },
+              "sum": {
+                "requests": 3120,
+                "bytes": 112000000,
+                "threats": 16,
+                "cachedRequests": 2921,
+                "cachedBytes": 94000000
+              }
+            }
+          ],
+          "geography": [
+            {
+              "count": 20450,
+              "dimensions": {
+                "clientCountryName": "China"
+              }
+            },
+            {
+              "count": 12340,
+              "dimensions": {
+                "clientCountryName": "Japan"
+              }
+            },
+            {
+              "count": 8970,
+              "dimensions": {
+                "clientCountryName": "United States"
+              }
+            },
+            {
+              "count": 6520,
+              "dimensions": {
+                "clientCountryName": "Canada"
+              }
+            },
+            {
+              "count": 4830,
+              "dimensions": {
+                "clientCountryName": "France"
               }
             }
           ]

@@ -9,14 +9,22 @@ const GeographyStats = ({ data, formatNumber, formatBytes }) => {
   const aggregateGeographyData = () => {
     const countryStats = {};
     
-    if (!data || !Array.isArray(data)) return [];
+    if (!data || !Array.isArray(data)) {
+      console.warn('GeographyStats: data is not an array or is null');
+      return [];
+    }
+    
+    console.log('GeographyStats: Processing data:', data);
     
     data.forEach(account => {
+      console.log(`Processing account: ${account.name}`);
       if (account.zones && Array.isArray(account.zones)) {
         account.zones.forEach(zone => {
+          console.log(`Processing zone: ${zone.domain}, geography:`, zone.geography);
           if (zone.geography && Array.isArray(zone.geography)) {
             zone.geography.forEach(geo => {
               const countryName = geo.dimensions?.clientCountryName;
+              console.log(`Processing country: ${countryName}, count: ${geo.count}`);
               if (countryName && countryName !== 'Unknown' && countryName !== '') {
                 if (!countryStats[countryName]) {
                   countryStats[countryName] = {
@@ -33,15 +41,21 @@ const GeographyStats = ({ data, formatNumber, formatBytes }) => {
                 countryStats[countryName].threats += 0;
               }
             });
+          } else {
+            console.warn(`Zone ${zone.domain} has no geography data`);
           }
         });
+      } else {
+        console.warn(`Account ${account.name} has no zones or zones is not an array`);
       }
     });
     
-    // 按请求数排序并取前5个
-    return Object.values(countryStats)
+    const result = Object.values(countryStats)
       .sort((a, b) => b.requests - a.requests)
       .slice(0, 5);
+    
+    console.log('GeographyStats: Final aggregated data:', result);
+    return result;
   };
 
   const topCountries = aggregateGeographyData();

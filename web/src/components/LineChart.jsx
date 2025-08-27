@@ -17,8 +17,11 @@ const CFLineChart = ({ domain, raw, rawHours, selectedPeriod }) => {
   const useHourlyData = selectedPeriod === '1day' || selectedPeriod === '3days';
   const sourceData = useHourlyData ? rawHours : raw;
   
+  console.log(`LineChart ${domain}: useHourlyData=${useHourlyData}, sourceData length:`, sourceData?.length);
+  
   // 数据验证
   if (!sourceData || !Array.isArray(sourceData) || sourceData.length === 0) {
+    console.warn(`LineChart ${domain}: 缺少${useHourlyData ? '小时级' : '天级'}数据`);
     return (
       <div style={{ 
         background: 'white',
@@ -41,8 +44,28 @@ const CFLineChart = ({ domain, raw, rawHours, selectedPeriod }) => {
           textAlign: 'center',
           padding: '40px 0'
         }}>
-          暂无{useHourlyData ? t('noHourlyData').replace('暂无小时级数据或数据格式错误', '') : t('noDailyData').replace('暂无天级数据或数据格式错误', '')}数据或数据格式错误
+          暂无{useHourlyData ? '小时级' : '天级'}数据
+          {useHourlyData && raw && raw.length > 0 && (
+            <><br /><small>（使用天级数据代替）</small></>
+          )}
         </p>
+        {useHourlyData && raw && raw.length > 0 && (
+          <div style={{ textAlign: 'center', marginTop: '16px' }}>
+            <button 
+              onClick={() => window.location.reload()} 
+              style={{
+                padding: '8px 16px',
+                backgroundColor: '#667eea',
+                color: 'white',
+                border: 'none',
+                borderRadius: '6px',
+                cursor: 'pointer'
+              }}
+            >
+              使用天级数据显示
+            </button>
+          </div>
+        )}
       </div>
     );
   }
