@@ -313,8 +313,8 @@ async function updateData() {
               }
             }`;
 
-          // 获取地理位置数据（过去7天）
-          const geoSince = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString().slice(0, 10); // 7天前
+          // 获取地理位置数据（过去1天，符合API限制）
+          const geoSince = new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toISOString().slice(0, 10); // 1天前
           const geoUntil = new Date().toISOString().slice(0, 10); // 今天
 
           console.log(`    查询地理位置数据时间范围: ${geoSince} 到 ${geoUntil}`);

@@ -217,12 +217,14 @@ const Dashboard = ({ accounts, selectedPeriod, onPeriodChange }) => {
         formatBytes={formatBytes}
       />
 
-      {/* 地理位置统计 */}
-      <GeographyStats
-        data={accounts}
-        formatNumber={formatNumber}
-        formatBytes={formatBytes}
-      />
+      {/* 地理位置统计 - 仅在单日数据时显示 */}
+      {selectedPeriod === '1day' && (
+        <GeographyStats
+          data={accounts}
+          formatNumber={formatNumber}
+          formatBytes={formatBytes}
+        />
+      )}
 
       {/* 图表区域 */}
       <div className="charts-section">
