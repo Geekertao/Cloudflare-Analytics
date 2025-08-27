@@ -313,9 +313,10 @@ async function updateData() {
               }
             }`;
 
-          // 获取地理位置数据（过去1天，符合API限制）
-          const geoSince = new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toISOString().slice(0, 10); // 1天前
-          const geoUntil = new Date().toISOString().slice(0, 10); // 今天
+          // 获取地理位置数据（仅今天，严格符合API限制）
+          const today = new Date().toISOString().slice(0, 10); // 今天日期
+          const geoSince = today; // 从今天开始
+          const geoUntil = today; // 到今天结束
 
           console.log(`    查询地理位置数据时间范围: ${geoSince} 到 ${geoUntil}`);
 

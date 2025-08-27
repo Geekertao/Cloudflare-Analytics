@@ -13,7 +13,7 @@ English | [中文](./README.md)
 - Hourly precision for 1-day and 3-day data
 - Daily precision for 7-day and 30-day data
 - Multi-language support (Chinese/English)
-- **Geography Statistics**: Bar chart and list display of top 5 countries/regions by traffic
+- **Geography Statistics**: Bar chart and list display of today's top 5 countries/regions by traffic (only shown in 1-day data view)
 
 ## Tech Stack
 
@@ -161,7 +161,7 @@ If you encounter `npm ci` related build errors, please ensure:
 
 - **Statistics Cards**: Total requests, traffic, and threats
 - **Cache Analytics**: Request and bandwidth cache statistics with pie charts
-- **Geography Analytics**: Bar chart and detailed list showing top 5 countries/regions by traffic volume
+- **Geography Analytics**: Shows today's top 5 countries/regions by traffic volume (only displayed in 1-day data view)
 - **Traffic Trends**: Line charts showing hourly/daily trends
 - **Responsive Design**: Perfect adaptation for desktop and mobile
 
