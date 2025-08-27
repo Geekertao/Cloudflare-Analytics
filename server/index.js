@@ -283,8 +283,8 @@ async function updateData() {
               }
             }`;
 
-          // 获取小时级数据（用于1天和3天显示）
-          const hoursSince = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString(); // 7天前
+          // 获取小时级数据（用于1天和3天显示，限制在3天内）
+          const hoursSince = new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString(); // 3天前
           const hoursUntil = new Date().toISOString(); // 现在
 
           console.log(`    查询小时级数据时间范围: ${hoursSince} 到 ${hoursUntil}`);
@@ -327,13 +327,9 @@ async function updateData() {
                     filter: {date_geq: $since, date_leq: $until}
                     limit: 15
                   ) {
+                    count
                     dimensions {
                       clientCountryName
-                    }
-                    sum {
-                      requests
-                      bytes
-                      threats
                     }
                   }
                 }
@@ -423,7 +419,7 @@ async function updateData() {
             zoneData.geography = rawGeoData;
 
             if (rawGeoData.length > 0) {
-              const topCountries = rawGeoData.slice(0, 5).map(d => `${d.dimensions.clientCountryName}: ${d.sum.requests}`);
+              const topCountries = rawGeoData.slice(0, 5).map(d => `${d.dimensions.clientCountryName}: ${d.count}`);
               console.log(`    前5个国家/地区: ${topCountries.join(', ')}`);
             }
           }

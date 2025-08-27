@@ -26,9 +26,11 @@ const GeographyStats = ({ data, formatNumber, formatBytes }) => {
                     threats: 0
                   };
                 }
-                countryStats[countryName].requests += geo.sum?.requests || 0;
-                countryStats[countryName].bytes += geo.sum?.bytes || 0;
-                countryStats[countryName].threats += geo.sum?.threats || 0;
+                // 由于httpRequestsAdaptiveGroups只返回count字段，我们使用count作为请求数
+                countryStats[countryName].requests += geo.count || 0;
+                // bytes和threats暂无数据，设为0
+                countryStats[countryName].bytes += 0;
+                countryStats[countryName].threats += 0;
               }
             });
           }
@@ -62,11 +64,8 @@ const GeographyStats = ({ data, formatNumber, formatBytes }) => {
           <p style={{ margin: '0 0 4px 0', color: '#666' }}>
             {t('requests')}: {formatNumber(data.requests)}
           </p>
-          <p style={{ margin: '0 0 4px 0', color: '#666' }}>
-            {t('traffic')}: {formatBytes(data.bytes)}
-          </p>
-          <p style={{ margin: '0', color: '#666' }}>
-            {t('threats')}: {formatNumber(data.threats)}
+          <p style={{ margin: '0', color: '#999', fontSize: '12px' }}>
+            {t('traffic')}和{t('threats')}数据暂时不可用
           </p>
         </div>
       );
@@ -136,8 +135,6 @@ const GeographyStats = ({ data, formatNumber, formatBytes }) => {
             <div className="col-rank">#</div>
             <div className="col-country">{t('countryRegion')}</div>
             <div className="col-requests">{t('requests')}</div>
-            <div className="col-traffic">{t('traffic')}</div>
-            <div className="col-threats">{t('threats')}</div>
           </div>
           {topCountries.map((country, index) => (
             <div key={country.country} className="table-row">
@@ -150,12 +147,6 @@ const GeographyStats = ({ data, formatNumber, formatBytes }) => {
               </div>
               <div className="col-requests">
                 {formatNumber(country.requests)}
-              </div>
-              <div className="col-traffic">
-                {formatBytes(country.bytes)}
-              </div>
-              <div className="col-threats">
-                {formatNumber(country.threats)}
               </div>
             </div>
           ))}

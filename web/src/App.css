@@ -614,7 +614,7 @@
 .table-header,
 .table-row {
   display: grid;
-  grid-template-columns: 40px 1fr 100px 100px 80px;
+  grid-template-columns: 40px 1fr 120px;
   align-items: center;
   padding: 12px;
   gap: 12px;
@@ -708,7 +708,7 @@
   
   .table-header,
   .table-row {
-    grid-template-columns: 30px 1fr 80px 80px 60px;
+    grid-template-columns: 30px 1fr 100px;
     padding: 8px;
     gap: 8px;
     font-size: 12px;
