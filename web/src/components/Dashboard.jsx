@@ -279,7 +279,7 @@ const Dashboard = ({ accounts, selectedPeriod, onPeriodChange }) => {
         <div className="powered-by-content">
           <p className="powered-by-text">{t('poweredBy')}</p>
           <div className="powered-by-badges">
-            <a href="https://github.com/Geekertao/Cloudflare-Analytics"><img src="https://img.shields.io/badge/Cloudflare%20Analytics-Dashboard-F38020?style=for-the-badge&logo=cloudflare&logoColor=white" alt="Cloudflare Analytics" />
+            <a href="https://developers.cloudflare.com/analytics/graphql-api/"><img src="https://img.shields.io/badge/Cloudflare%20GraphQL%20Analytics%20API-F38020?style=for-the-badge&logo=cloudflare&logoColor=white" alt="Cloudflare GraphQL Analytics API" />
             </a>
             <a href="https://github.com/Geekertao/Cloudflare-Analytics">
               <img src="https://img.shields.io/badge/GitHub-Click%20to%20open-181717?style=for-the-badge&logo=github&logoColor=white" alt="GitHub Repository" />
