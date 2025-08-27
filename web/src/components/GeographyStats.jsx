@@ -75,11 +75,8 @@ const GeographyStats = ({ data, formatNumber, formatBytes }) => {
           <p style={{ margin: '0 0 8px 0', fontWeight: '600', color: '#333' }}>
             {data.country}
           </p>
-          <p style={{ margin: '0 0 4px 0', color: '#666' }}>
+          <p style={{ margin: '0', color: '#666' }}>
             {t('requests')}: {formatNumber(data.requests)}
-          </p>
-          <p style={{ margin: '0', color: '#999', fontSize: '12px' }}>
-            {t('traffic')}和{t('threats')}数据暂时不可用
           </p>
         </div>
       );
