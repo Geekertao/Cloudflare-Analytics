@@ -348,16 +348,22 @@ async function updateData() {
             query($zone: String!, $since: Date!, $until: Date!) {
               viewer {
                 zones(filter: {zoneTag: $zone}) {
-                  httpRequestsAdaptiveGroups(
+                  httpRequests1dGroups(
                     filter: {date_geq: $since, date_leq: $until}
                     limit: 100
                     orderBy: [date_DESC]
                   ) {
                     dimensions {
                       date
-                      clientCountryName
                     }
-                    count
+                    sum {
+                      countryMap {
+                        bytes
+                        requests
+                        threats
+                        clientCountryName
+                      }
+                    }
                   }
                 }
               }
@@ -440,26 +446,30 @@ async function updateData() {
             if (!zoneData.error) {
               zoneData.error = geoRes.data.errors[0]?.message || '地理位置数据API请求失败';
             }
-          } else if (geoRes.data.data?.viewer?.zones?.[0]?.httpRequestsAdaptiveGroups) {
-            const rawGeoData = geoRes.data.data.viewer.zones[0].httpRequestsAdaptiveGroups;
+          } else if (geoRes.data.data?.viewer?.zones?.[0]?.httpRequests1dGroups) {
+            const rawGeoData = geoRes.data.data.viewer.zones[0].httpRequests1dGroups;
             console.log(`    Zone ${z.domain} 地理位置数据获取成功: ${rawGeoData.length} 条记录`);
 
             // 聚合地理位置数据（按国家汇总今日数据）
             const countryStats = {};
             rawGeoData.forEach(record => {
-              const country = record.dimensions?.clientCountryName;
-              if (country && country !== 'Unknown' && country !== '') {
-                if (!countryStats[country]) {
-                  countryStats[country] = {
-                    dimensions: { clientCountryName: country },
-                    sum: { requests: 0, bytes: 0, threats: 0 }
-                  };
-                }
-                // httpRequestsAdaptiveGroups使用count字段
-                countryStats[country].sum.requests += record.count || 0;
-                // 注意：AdaptiveGroups可能没有bytes和threats数据
-                countryStats[country].sum.bytes += 0;
-                countryStats[country].sum.threats += 0;
+              // 处理countryMap数组，每个记录可能包含多个国家的数据
+              if (record.sum?.countryMap && Array.isArray(record.sum.countryMap)) {
+                record.sum.countryMap.forEach(countryData => {
+                  const country = countryData.clientCountryName;
+                  if (country && country !== 'Unknown' && country !== '') {
+                    if (!countryStats[country]) {
+                      countryStats[country] = {
+                        dimensions: { clientCountryName: country },
+                        sum: { requests: 0, bytes: 0, threats: 0 }
+                      };
+                    }
+                    // 使用countryMap中的实际数据
+                    countryStats[country].sum.requests += countryData.requests || 0;
+                    countryStats[country].sum.bytes += countryData.bytes || 0;
+                    countryStats[country].sum.threats += countryData.threats || 0;
+                  }
+                });
               }
             });
 
