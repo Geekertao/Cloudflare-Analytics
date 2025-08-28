@@ -355,7 +355,7 @@ async function updateData() {
                   ) {
                     dimensions {
                       date
-                      country
+                      clientCountryName
                     }
                     sum {
                       requests
@@ -451,7 +451,7 @@ async function updateData() {
             // 聚合地理位置数据（按国家汇总今日数据）
             const countryStats = {};
             rawGeoData.forEach(record => {
-              const country = record.dimensions?.country;
+              const country = record.dimensions?.clientCountryName;
               if (country && country !== 'Unknown' && country !== '') {
                 if (!countryStats[country]) {
                   countryStats[country] = {
