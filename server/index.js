@@ -348,7 +348,7 @@ async function updateData() {
             query($zone: String!, $since: Date!, $until: Date!) {
               viewer {
                 zones(filter: {zoneTag: $zone}) {
-                  httpRequests1dGroups(
+                  httpRequestsAdaptiveGroups(
                     filter: {date_geq: $since, date_leq: $until}
                     limit: 100
                     orderBy: [date_DESC]
@@ -357,11 +357,7 @@ async function updateData() {
                       date
                       clientCountryName
                     }
-                    sum {
-                      requests
-                      bytes
-                      threats
-                    }
+                    count
                   }
                 }
               }
@@ -444,8 +440,8 @@ async function updateData() {
             if (!zoneData.error) {
               zoneData.error = geoRes.data.errors[0]?.message || '地理位置数据API请求失败';
             }
-          } else if (geoRes.data.data?.viewer?.zones?.[0]?.httpRequests1dGroups) {
-            const rawGeoData = geoRes.data.data.viewer.zones[0].httpRequests1dGroups;
+          } else if (geoRes.data.data?.viewer?.zones?.[0]?.httpRequestsAdaptiveGroups) {
+            const rawGeoData = geoRes.data.data.viewer.zones[0].httpRequestsAdaptiveGroups;
             console.log(`    Zone ${z.domain} 地理位置数据获取成功: ${rawGeoData.length} 条记录`);
 
             // 聚合地理位置数据（按国家汇总今日数据）
@@ -459,9 +455,11 @@ async function updateData() {
                     sum: { requests: 0, bytes: 0, threats: 0 }
                   };
                 }
-                countryStats[country].sum.requests += record.sum?.requests || 0;
-                countryStats[country].sum.bytes += record.sum?.bytes || 0;
-                countryStats[country].sum.threats += record.sum?.threats || 0;
+                // httpRequestsAdaptiveGroups使用count字段
+                countryStats[country].sum.requests += record.count || 0;
+                // 注意：AdaptiveGroups可能没有bytes和threats数据
+                countryStats[country].sum.bytes += 0;
+                countryStats[country].sum.threats += 0;
               }
             });
 
