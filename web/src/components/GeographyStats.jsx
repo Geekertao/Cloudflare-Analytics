@@ -93,12 +93,38 @@ const GeographyStats = ({ data, formatNumber, formatBytes }) => {
           <p style={{ margin: '0 0 8px 0', fontWeight: '600', color: themeColors.text }}>
             {data.country}
           </p>
-          <p style={{ margin: '0 0 4px 0', color: themeColors.textSecondary }}>
-            {t('requests')}: {formatNumber(data.requests)}
-          </p>
-          <p style={{ margin: '0', color: themeColors.textSecondary }}>
-            {t('bandwidth')}: {formatBytes(data.bytes)}
-          </p>
+          <div style={{ 
+            display: 'flex', 
+            alignItems: 'center', 
+            margin: '0 0 4px 0', 
+            color: themeColors.textSecondary 
+          }}>
+            <div style={{
+              width: '12px',
+              height: '12px',
+              backgroundColor: themeColors.chartColors.requests,
+              borderRadius: '2px',
+              marginRight: '8px',
+              flexShrink: 0
+            }}></div>
+            <span>{t('requests')}: {formatNumber(data.requests)}</span>
+          </div>
+          <div style={{ 
+            display: 'flex', 
+            alignItems: 'center', 
+            margin: '0', 
+            color: themeColors.textSecondary 
+          }}>
+            <div style={{
+              width: '12px',
+              height: '12px',
+              backgroundColor: themeColors.chartColors.bandwidth,
+              borderRadius: '2px',
+              marginRight: '8px',
+              flexShrink: 0
+            }}></div>
+            <span>{t('bandwidth')}: {formatBytes(data.bytes)}</span>
+          </div>
         </div>
       );
     }
@@ -160,7 +186,8 @@ const GeographyStats = ({ data, formatNumber, formatBytes }) => {
             <YAxis 
               yAxisId="bandwidth"
               orientation="right"
-              tick={{ fontSize: 12, fill: themeColors.textSecondary }}
+              tick={false}
+              axisLine={false}
               label={{ value: t('bandwidth'), angle: 90, position: 'insideRight', style: { textAnchor: 'middle', fill: themeColors.textSecondary } }}
             />
             <Tooltip content={<CombinedTooltip />} />

@@ -1,6 +1,7 @@
 import React from 'react';
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, Legend } from 'recharts';
 import { useLanguage } from '../contexts/LanguageContext';
+import { useTheme } from '../contexts/ThemeContext';
 
 const CacheStats = ({ 
   totalRequests, 
@@ -13,6 +14,16 @@ const CacheStats = ({
   formatBytes 
 }) => {
   const { t } = useLanguage();
+  const { isDarkMode } = useTheme();
+  
+  // 主题相关的颜色配置
+  const themeColors = {
+    background: isDarkMode ? '#2d2d2d' : '#ffffff',
+    text: isDarkMode ? '#ffffff' : '#333333',
+    textSecondary: isDarkMode ? '#b0b0b0' : '#666666',
+    border: isDarkMode ? '#404040' : '#e1e1e1'
+  };
+  
   // 饼状图颜色配置
   const colors = ['#667eea', '#f093fb'];
   
@@ -52,18 +63,33 @@ const CacheStats = ({
   const CustomTooltip = ({ active, payload }) => {
     if (active && payload && payload.length) {
       const data = payload[0].payload;
+      const color = payload[0].color;
       return (
         <div style={{
-          backgroundColor: 'white',
+          backgroundColor: themeColors.background,
           padding: '12px',
-          border: '1px solid #e1e1e1',
+          border: `1px solid ${themeColors.border}`,
           borderRadius: '8px',
-          boxShadow: '0 4px 12px rgba(0,0,0,0.1)'
+          boxShadow: isDarkMode ? '0 4px 12px rgba(0,0,0,0.4)' : '0 4px 12px rgba(0,0,0,0.1)'
         }}>
-          <p style={{ margin: '0 0 4px 0', fontWeight: '600', color: '#333' }}>
-            {data.name}
-          </p>
-          <p style={{ margin: '0', color: '#666' }}>
+          <div style={{ 
+            display: 'flex',
+            alignItems: 'center',
+            margin: '0 0 4px 0'
+          }}>
+            <div style={{
+              width: '12px',
+              height: '12px',
+              backgroundColor: color,
+              borderRadius: '2px',
+              marginRight: '8px',
+              flexShrink: 0
+            }}></div>
+            <span style={{ fontWeight: '600', color: themeColors.text }}>
+              {data.name}
+            </span>
+          </div>
+          <p style={{ margin: '0', color: themeColors.textSecondary }}>
             {data.formatted} ({data.percentage.toFixed(1)}%)
           </p>
         </div>

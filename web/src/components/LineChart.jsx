@@ -203,13 +203,24 @@ const CFLineChart = ({ domain, raw, rawHours, selectedPeriod }) => {
             }
             
             return (
-              <p key={index} style={{ 
-                margin: '4px 0', 
-                color: entry.color,
+              <div key={index} style={{ 
+                display: 'flex',
+                alignItems: 'center',
+                margin: '4px 0',
                 fontSize: '14px'
               }}>
-                {`${entry.name}: ${value}`}
-              </p>
+                <div style={{
+                  width: '12px',
+                  height: '12px',
+                  backgroundColor: entry.color,
+                  borderRadius: '2px',
+                  marginRight: '8px',
+                  flexShrink: 0
+                }}></div>
+                <span style={{ color: themeColors.textSecondary }}>
+                  {`${entry.name}: ${value}`}
+                </span>
+              </div>
             );
           })}
         </div>
