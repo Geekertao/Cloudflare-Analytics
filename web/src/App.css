@@ -774,36 +774,7 @@
   margin: 0 0 16px 0;
 }
 
-/* 饼状图区域 */
-.geography-pie-section {
-  margin-bottom: 24px;
-}
 
-.geography-pie-section h3 {
-  font-size: 16px;
-  font-weight: 600;
-  color: var(--text-primary);
-  margin: 0 0 16px 0;
-}
-
-.pie-chart-container {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 24px;
-  align-items: center;
-}
-
-.pie-chart {
-  display: flex;
-  justify-content: center;
-}
-
-.pie-legend {
-  background: var(--bg-secondary);
-  padding: 16px;
-  border-radius: 8px;
-  border: 1px solid var(--border-color);
-}
 
 /* 双柱状图容器 */
 .charts-container {
@@ -946,20 +917,7 @@
     margin-bottom: 16px;
   }
 
-  /* 移动端饼状图布局 */
-  .pie-chart-container {
-    grid-template-columns: 1fr;
-    gap: 16px;
-  }
 
-  .pie-chart {
-    order: 2;
-  }
-
-  .pie-legend {
-    order: 1;
-    padding: 12px;
-  }
 
   /* 移动端双柱状图布局 */
   .charts-container {

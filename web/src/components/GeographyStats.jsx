@@ -1,5 +1,5 @@
 import React from 'react';
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, Legend } from 'recharts';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { useLanguage } from '../contexts/LanguageContext';
 
 const GeographyStats = ({ data, formatNumber, formatBytes }) => {
@@ -59,15 +59,6 @@ const GeographyStats = ({ data, formatNumber, formatBytes }) => {
 
   const topCountries = aggregateGeographyData();
 
-  // 饼状图配置
-  const pieColors = ['#667eea', '#764ba2', '#f093fb', '#f5576c', '#4facfe', '#00f2fe', '#43e97b', '#38f9d7', '#ffecd2', '#fcb69f'];
-  
-  // 准备饼状图数据（前5个国家）
-  const pieData = topCountries.slice(0, 5).map((country, index) => ({
-    ...country,
-    color: pieColors[index % pieColors.length]
-  }));
-
   // 计算总请求数用于百分比计算
   const totalRequests = topCountries.reduce((sum, country) => sum + country.requests, 0);
 
@@ -119,69 +110,6 @@ const GeographyStats = ({ data, formatNumber, formatBytes }) => {
     return null;
   };
 
-  // 自定义饼状图标签
-  const renderCustomLabel = ({ cx, cy, midAngle, innerRadius, outerRadius, percent, index, country }) => {
-    if (percent < 0.05) return null; // 小于5%不显示标签
-    
-    const RADIAN = Math.PI / 180;
-    const radius = innerRadius + (outerRadius - innerRadius) * 0.5;
-    const x = cx + radius * Math.cos(-midAngle * RADIAN);
-    const y = cy + radius * Math.sin(-midAngle * RADIAN);
-
-    return (
-      <text 
-        x={x} 
-        y={y} 
-        fill="white" 
-        textAnchor={x > cx ? 'start' : 'end'} 
-        dominantBaseline="central"
-        fontSize="12"
-        fontWeight="600"
-      >
-        {`${(percent * 100).toFixed(1)}%`}
-      </text>
-    );
-  };
-
-  // 自定义图例
-  const renderLegend = ({ payload }) => {
-    return (
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginTop: '16px' }}>
-        {payload.map((entry, index) => {
-          const data = pieData[index];
-          const percentage = totalRequests > 0 ? ((data.requests / totalRequests) * 100).toFixed(1) : '0.0';
-          return (
-            <div key={index} style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <div 
-                style={{
-                  width: '12px',
-                  height: '12px',
-                  backgroundColor: entry.color,
-                  borderRadius: '2px',
-                  flexShrink: 0
-                }}
-              />
-              <span style={{ 
-                fontSize: '13px', 
-                color: entry.color, // 文字颜色与饼状图颜色一致
-                flex: 1,
-                display: 'flex',
-                justifyContent: 'space-between',
-                alignItems: 'center',
-                fontWeight: '500'
-              }}>
-                <span>{entry.payload.country}</span>
-                <span style={{ fontWeight: '600' }}>
-                  {percentage}% ({formatNumber(data.requests)})
-                </span>
-              </span>
-            </div>
-          );
-        })}
-      </div>
-    );
-  };
-
   if (!topCountries || topCountries.length === 0) {
     return (
       <div className="geography-stats">
@@ -202,44 +130,6 @@ const GeographyStats = ({ data, formatNumber, formatBytes }) => {
         <h2>{t('geographyStats')}</h2>
         <p className="section-subtitle">{t('topCountriesRegions')}</p>
       </div>
-      
-      {/* 饼状图和图例 */}
-      <div className="geography-pie-section">
-        <h3>{t('requestDistribution')}</h3>
-        <div className="pie-chart-container">
-          <div className="pie-chart">
-            <ResponsiveContainer width="100%" height={250}>
-              <PieChart>
-                <Pie
-                  data={pieData}
-                  cx="50%"
-                  cy="50%"
-                  labelLine={false}
-                  label={renderCustomLabel}
-                  outerRadius={80}
-                  fill="#8884d8"
-                  dataKey="requests"
-                >
-                  {pieData.map((entry, index) => (
-                    <Cell key={`cell-${index}`} fill={entry.color} />
-                  ))}
-                </Pie>
-                <Tooltip 
-                  formatter={(value, name, props) => [
-                    formatNumber(value), 
-                    t('requests')
-                  ]}
-                  labelFormatter={(label) => props => props.payload[0]?.payload?.country}
-                />
-              </PieChart>
-            </ResponsiveContainer>
-          </div>
-          <div className="pie-legend">
-            {renderLegend({ payload: pieData })}
-          </div>
-        </div>
-      </div>
-
       {/* 双柱状图容器 */}
       <div className="charts-container">
         {/* 请求数柱状图 */}
