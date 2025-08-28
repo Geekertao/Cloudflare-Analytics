@@ -10,9 +10,30 @@ import {
   ResponsiveContainer
 } from 'recharts';
 import { useLanguage } from '../contexts/LanguageContext';
+import { useTheme } from '../contexts/ThemeContext';
 
 const CFLineChart = ({ domain, raw, rawHours, selectedPeriod }) => {
   const { t } = useLanguage();
+  const { isDarkMode } = useTheme();
+  
+  // 主题相关的颜色配置
+  const themeColors = {
+    background: isDarkMode ? '#2d2d2d' : '#ffffff',
+    text: isDarkMode ? '#ffffff' : '#333333',
+    textSecondary: isDarkMode ? '#b0b0b0' : '#666666',
+    textMuted: isDarkMode ? '#888888' : '#999999',
+    border: isDarkMode ? '#404040' : '#e1e1e1',
+    borderLight: isDarkMode ? '#353535' : '#f0f0f0',
+    grid: isDarkMode ? '#404040' : '#f0f0f0',
+    // 图表线条颜色
+    lineColors: {
+      requests: '#667eea',
+      cachedRequests: '#764ba2', 
+      bytes: '#f093fb',
+      threats: '#ff6b6b'
+    }
+  };
+  
   // 根据时间范围选择数据源：1天和3天使用小时级数据，7天和30天使用天级数据
   const useHourlyData = selectedPeriod === '1day' || selectedPeriod === '3days';
   const sourceData = useHourlyData ? rawHours : raw;
@@ -24,22 +45,23 @@ const CFLineChart = ({ domain, raw, rawHours, selectedPeriod }) => {
     console.warn(`LineChart ${domain}: 缺少${useHourlyData ? '小时级' : '天级'}数据`);
     return (
       <div style={{ 
-        background: 'white',
+        background: themeColors.background,
         padding: '24px',
         borderRadius: '12px',
-        boxShadow: '0 4px 20px rgba(0, 0, 0, 0.1)',
-        marginBottom: '20px'
+        boxShadow: isDarkMode ? '0 4px 20px rgba(0, 0, 0, 0.3)' : '0 4px 20px rgba(0, 0, 0, 0.1)',
+        marginBottom: '20px',
+        border: `1px solid ${themeColors.border}`
       }}>
         <h3 style={{ 
           margin: '0 0 12px 0', 
-          color: '#333',
+          color: themeColors.text,
           fontSize: '18px',
           fontWeight: '600'
         }}>
           {domain}
         </h3>
         <p style={{ 
-          color: '#999',
+          color: themeColors.textMuted,
           margin: 0,
           textAlign: 'center',
           padding: '40px 0'
@@ -117,22 +139,23 @@ const CFLineChart = ({ domain, raw, rawHours, selectedPeriod }) => {
   if (data.length === 0) {
     return (
       <div style={{ 
-        background: 'white',
+        background: themeColors.background,
         padding: '24px',
         borderRadius: '12px',
-        boxShadow: '0 4px 20px rgba(0, 0, 0, 0.1)',
-        marginBottom: '20px'
+        boxShadow: isDarkMode ? '0 4px 20px rgba(0, 0, 0, 0.3)' : '0 4px 20px rgba(0, 0, 0, 0.1)',
+        marginBottom: '20px',
+        border: `1px solid ${themeColors.border}`
       }}>
         <h3 style={{ 
           margin: '0 0 12px 0', 
-          color: '#333',
+          color: themeColors.text,
           fontSize: '18px',
           fontWeight: '600'
         }}>
           {domain}
         </h3>
         <p style={{ 
-          color: '#999',
+          color: themeColors.textMuted,
           margin: 0,
           textAlign: 'center',
           padding: '40px 0'
@@ -161,13 +184,13 @@ const CFLineChart = ({ domain, raw, rawHours, selectedPeriod }) => {
     if (active && payload && payload.length) {
       return (
         <div style={{
-          backgroundColor: 'white',
+          backgroundColor: themeColors.background,
           padding: '12px',
-          border: '1px solid #e1e1e1',
+          border: `1px solid ${themeColors.border}`,
           borderRadius: '8px',
-          boxShadow: '0 4px 12px rgba(0,0,0,0.1)'
+          boxShadow: isDarkMode ? '0 4px 12px rgba(0,0,0,0.4)' : '0 4px 12px rgba(0,0,0,0.1)'
         }}>
-          <p style={{ margin: '0 0 8px 0', fontWeight: '600', color: '#333' }}>
+          <p style={{ margin: '0 0 8px 0', fontWeight: '600', color: themeColors.text }}>
             {useHourlyData ? `时间: ${label}` : `日期: ${label}`}
           </p>
           {payload.map((entry, index) => {
@@ -209,11 +232,12 @@ const CFLineChart = ({ domain, raw, rawHours, selectedPeriod }) => {
 
   return (
     <div style={{ 
-      background: 'white',
+      background: themeColors.background,
       padding: '24px',
       borderRadius: '12px',
-      boxShadow: '0 4px 20px rgba(0, 0, 0, 0.1)',
-      marginBottom: '20px'
+      boxShadow: isDarkMode ? '0 4px 20px rgba(0, 0, 0, 0.3)' : '0 4px 20px rgba(0, 0, 0, 0.1)',
+      marginBottom: '20px',
+      border: `1px solid ${themeColors.border}`
     }}>
       {/* 头部信息 */}
       <div style={{ 
@@ -227,14 +251,14 @@ const CFLineChart = ({ domain, raw, rawHours, selectedPeriod }) => {
         <div>
           <h3 style={{ 
             margin: '0 0 8px 0', 
-            color: '#333',
+            color: themeColors.text,
             fontSize: '18px',
             fontWeight: '600'
           }}>
             {domain}
           </h3>
           <p style={{ 
-            color: '#666',
+            color: themeColors.textSecondary,
             margin: 0,
             fontSize: '14px'
           }}>
@@ -251,16 +275,16 @@ const CFLineChart = ({ domain, raw, rawHours, selectedPeriod }) => {
           display: 'flex', 
           gap: '20px',
           fontSize: '12px',
-          color: '#666'
+          color: themeColors.textSecondary
         }}>
           <div style={{ textAlign: 'center' }}>
-            <div style={{ fontWeight: '600', color: '#333' }}>
+            <div style={{ fontWeight: '600', color: themeColors.text }}>
               {formatNumber(totalData.requests)}
             </div>
             <div>{t('totalRequestsShort')}</div>
           </div>
           <div style={{ textAlign: 'center' }}>
-            <div style={{ fontWeight: '600', color: '#333' }}>
+            <div style={{ fontWeight: '600', color: themeColors.text }}>
               {formatBytes(totalData.bytes)}
             </div>
             <div>{t('totalTrafficShort')}</div>
@@ -280,24 +304,24 @@ const CFLineChart = ({ domain, raw, rawHours, selectedPeriod }) => {
           data={data} 
           margin={{ top: 20, right: 30, left: 20, bottom: 20 }}
         >
-          <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+          <CartesianGrid strokeDasharray="3 3" stroke={themeColors.grid} />
           <XAxis 
             dataKey="date" 
-            tick={{ fontSize: 12, fill: '#666' }}
-            axisLine={{ stroke: '#e1e1e1' }}
+            tick={{ fontSize: 12, fill: themeColors.textSecondary }}
+            axisLine={{ stroke: themeColors.border }}
           />
           <YAxis 
             yAxisId="left" 
-            tick={{ fontSize: 12, fill: '#666' }}
+            tick={{ fontSize: 12, fill: themeColors.textSecondary }}
             tickFormatter={formatNumber}
-            axisLine={{ stroke: '#e1e1e1' }}
+            axisLine={{ stroke: themeColors.border }}
           />
           <YAxis 
             yAxisId="right" 
             orientation="right" 
-            tick={{ fontSize: 12, fill: '#666' }}
+            tick={{ fontSize: 12, fill: themeColors.textSecondary }}
             tickFormatter={formatBytes}
-            axisLine={{ stroke: '#e1e1e1' }}
+            axisLine={{ stroke: themeColors.border }}
           />
           <Tooltip content={<CustomTooltip />} />
           <Legend />
@@ -305,42 +329,42 @@ const CFLineChart = ({ domain, raw, rawHours, selectedPeriod }) => {
             yAxisId="left"
             type="monotone"
             dataKey="requests"
-            stroke="#667eea"
+            stroke={themeColors.lineColors.requests}
             strokeWidth={3}
             name={t('requests')}
             connectNulls={false}
-            dot={{ fill: '#667eea', strokeWidth: 2, r: 4 }}
+            dot={{ fill: themeColors.lineColors.requests, strokeWidth: 2, r: 4 }}
           />
           <Line
             yAxisId="left"
             type="monotone"
             dataKey="cachedRequests"
-            stroke="#764ba2"
+            stroke={themeColors.lineColors.cachedRequests}
             strokeWidth={2}
             strokeDasharray="5 5"
             name={t('cachedRequestsChart')}
             connectNulls={false}
-            dot={{ fill: '#764ba2', strokeWidth: 2, r: 3 }}
+            dot={{ fill: themeColors.lineColors.cachedRequests, strokeWidth: 2, r: 3 }}
           />
           <Line
             yAxisId="right"
             type="monotone"
             dataKey="bytes"
-            stroke="#f093fb"
+            stroke={themeColors.lineColors.bytes}
             strokeWidth={3}
             name={t('traffic')}
             connectNulls={false}
-            dot={{ fill: '#f093fb', strokeWidth: 2, r: 4 }}
+            dot={{ fill: themeColors.lineColors.bytes, strokeWidth: 2, r: 4 }}
           />
           <Line
             yAxisId="left"
             type="monotone"
             dataKey="threats"
-            stroke="#ff6b6b"
+            stroke={themeColors.lineColors.threats}
             strokeWidth={2}
             name={t('threats')}
             connectNulls={false}
-            dot={{ fill: '#ff6b6b', strokeWidth: 2, r: 3 }}
+            dot={{ fill: themeColors.lineColors.threats, strokeWidth: 2, r: 3 }}
           />
         </LineChart>
       </ResponsiveContainer>

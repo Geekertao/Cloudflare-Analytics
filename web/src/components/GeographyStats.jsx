@@ -1,9 +1,25 @@
 import React from 'react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { useLanguage } from '../contexts/LanguageContext';
+import { useTheme } from '../contexts/ThemeContext';
 
 const GeographyStats = ({ data, formatNumber, formatBytes }) => {
   const { t } = useLanguage();
+  const { isDarkMode } = useTheme();
+  
+  // 主题相关的颜色配置
+  const themeColors = {
+    background: isDarkMode ? '#2d2d2d' : '#ffffff',
+    text: isDarkMode ? '#ffffff' : '#333333',
+    textSecondary: isDarkMode ? '#b0b0b0' : '#666666',
+    border: isDarkMode ? '#404040' : '#e1e1e1',
+    grid: isDarkMode ? '#404040' : undefined, // 深色模式使用更明显的网格
+    // 图表颜色保持一致
+    chartColors: {
+      requests: '#667eea',
+      bandwidth: '#764ba2'
+    }
+  };
   
   // 聚合所有Zone的地理位置数据
   const aggregateGeographyData = () => {
@@ -68,16 +84,16 @@ const GeographyStats = ({ data, formatNumber, formatBytes }) => {
       const data = payload[0].payload;
       return (
         <div style={{
-          backgroundColor: 'white',
+          backgroundColor: themeColors.background,
           padding: '12px',
-          border: '1px solid #e1e1e1',
+          border: `1px solid ${themeColors.border}`,
           borderRadius: '8px',
-          boxShadow: '0 4px 12px rgba(0,0,0,0.1)'
+          boxShadow: isDarkMode ? '0 4px 12px rgba(0,0,0,0.4)' : '0 4px 12px rgba(0,0,0,0.1)'
         }}>
-          <p style={{ margin: '0 0 8px 0', fontWeight: '600', color: '#333' }}>
+          <p style={{ margin: '0 0 8px 0', fontWeight: '600', color: themeColors.text }}>
             {data.country}
           </p>
-          <p style={{ margin: '0', color: '#666' }}>
+          <p style={{ margin: '0', color: themeColors.textSecondary }}>
             {t('requests')}: {formatNumber(data.requests)}
           </p>
         </div>
@@ -92,16 +108,16 @@ const GeographyStats = ({ data, formatNumber, formatBytes }) => {
       const data = payload[0].payload;
       return (
         <div style={{
-          backgroundColor: 'white',
+          backgroundColor: themeColors.background,
           padding: '12px',
-          border: '1px solid #e1e1e1',
+          border: `1px solid ${themeColors.border}`,
           borderRadius: '8px',
-          boxShadow: '0 4px 12px rgba(0,0,0,0.1)'
+          boxShadow: isDarkMode ? '0 4px 12px rgba(0,0,0,0.4)' : '0 4px 12px rgba(0,0,0,0.1)'
         }}>
-          <p style={{ margin: '0 0 8px 0', fontWeight: '600', color: '#333' }}>
+          <p style={{ margin: '0 0 8px 0', fontWeight: '600', color: themeColors.text }}>
             {data.country}
           </p>
-          <p style={{ margin: '0', color: '#666' }}>
+          <p style={{ margin: '0', color: themeColors.textSecondary }}>
             {t('bandwidth')}: {formatBytes(data.bytes)}
           </p>
         </div>
@@ -145,20 +161,24 @@ const GeographyStats = ({ data, formatNumber, formatBytes }) => {
                 bottom: 60
               }}
             >
-              <CartesianGrid strokeDasharray="3 3" opacity={0.3} />
+              <CartesianGrid 
+                strokeDasharray="3 3" 
+                opacity={0.3}
+                stroke={themeColors.grid}
+              />
               <XAxis 
                 dataKey="country" 
                 angle={-45}
                 textAnchor="end"
                 height={80}
                 interval={0}
-                tick={{ fontSize: 12 }}
+                tick={{ fontSize: 12, fill: themeColors.textSecondary }}
               />
-              <YAxis tick={{ fontSize: 12 }} />
+              <YAxis tick={{ fontSize: 12, fill: themeColors.textSecondary }} />
               <Tooltip content={<RequestsTooltip />} />
               <Bar 
                 dataKey="requests" 
-                fill="#667eea" 
+                fill={themeColors.chartColors.requests}
                 radius={[4, 4, 0, 0]}
               />
             </BarChart>
@@ -178,20 +198,24 @@ const GeographyStats = ({ data, formatNumber, formatBytes }) => {
                 bottom: 60
               }}
             >
-              <CartesianGrid strokeDasharray="3 3" opacity={0.3} />
+              <CartesianGrid 
+                strokeDasharray="3 3" 
+                opacity={0.3}
+                stroke={themeColors.grid}
+              />
               <XAxis 
                 dataKey="country" 
                 angle={-45}
                 textAnchor="end"
                 height={80}
                 interval={0}
-                tick={{ fontSize: 12 }}
+                tick={{ fontSize: 12, fill: themeColors.textSecondary }}
               />
-              <YAxis tick={{ fontSize: 12 }} />
+              <YAxis tick={{ fontSize: 12, fill: themeColors.textSecondary }} />
               <Tooltip content={<BandwidthTooltip />} />
               <Bar 
                 dataKey="bytes" 
-                fill="#764ba2" 
+                fill={themeColors.chartColors.bandwidth}
                 radius={[4, 4, 0, 0]}
               />
             </BarChart>
