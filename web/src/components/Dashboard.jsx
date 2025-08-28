@@ -1,4 +1,4 @@
-import React, { useMemo, useEffect, useState } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import StatsCards from './StatsCards';
 import CacheStats from './CacheStats';
 import GeographyStats from './GeographyStats';
@@ -131,7 +131,7 @@ const Dashboard = ({ accounts, selectedPeriod, onPeriodChange }) => {
       cacheRequestsRatio: totalRequests > 0 ? ((totalCachedRequests / totalRequests) * 100).toFixed(1) : 0,
       cacheBytesRatio: totalBytes > 0 ? ((totalCachedBytes / totalBytes) * 100).toFixed(1) : 0
     };
-  }, [accounts, selectedPeriod]); // 添加selectedPeriod作为依赖项
+  }, [accounts, selectedPeriod]);
 
   const formatBytes = (bytes) => {
     if (bytes === 0) return '0 B';
