@@ -252,6 +252,7 @@ const Dashboard = ({ accounts, selectedPeriod, onPeriodChange }) => {
         totalThreats={aggregatedData.totalThreats}
         formatNumber={formatNumber}
         formatBytes={formatBytes}
+        accounts={accounts}
       />
 
       {/* 缓存统计 */}

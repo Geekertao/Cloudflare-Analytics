@@ -1,8 +1,32 @@
 import React from 'react';
 import { useLanguage } from '../contexts/LanguageContext';
 
-const StatsCards = ({ totalRequests, totalBytes, totalThreats, formatNumber, formatBytes }) => {
+const StatsCards = ({ totalRequests, totalBytes, totalThreats, formatNumber, formatBytes, accounts }) => {
   const { t } = useLanguage();
+  
+  // 计算活跃Zone数
+  const calculateActiveZones = () => {
+    if (!accounts || !Array.isArray(accounts)) return 0;
+    
+    let activeZoneCount = 0;
+    accounts.forEach(account => {
+      if (account.zones && Array.isArray(account.zones)) {
+        account.zones.forEach(zone => {
+          // 检查Zone是否有数据（有raw或rawHours数据即为活跃）
+          const hasData = (zone.raw && zone.raw.length > 0) || 
+                         (zone.rawHours && zone.rawHours.length > 0);
+          if (hasData) {
+            activeZoneCount++;
+          }
+        });
+      }
+    });
+    
+    return activeZoneCount;
+  };
+  
+  const activeZones = calculateActiveZones();
+  
   const stats = [
     {
       label: t('totalRequests'),
@@ -20,8 +44,8 @@ const StatsCards = ({ totalRequests, totalBytes, totalThreats, formatNumber, for
       icon: '🛡️'
     },
     {
-      label: '活跃Zone数',
-      value: '多个', // 可以根据实际需要计算
+      label: t('activeZones'),
+      value: activeZones.toString(),
       icon: '🌐'
     }
   ];
@@ -30,7 +54,12 @@ const StatsCards = ({ totalRequests, totalBytes, totalThreats, formatNumber, for
     <div className="stats-grid">
       {stats.map((stat, index) => (
         <div key={index} className="stat-card">
-          <div style={{ display: 'flex', alignItems: 'center', marginBottom: '12px' }}>
+          <div style={{ 
+            display: 'flex', 
+            alignItems: 'center', 
+            justifyContent: 'center',
+            marginBottom: '12px' 
+          }}>
             <span style={{ fontSize: '24px', marginRight: '12px' }}>{stat.icon}</span>
             <div className="stat-label">{stat.label}</div>
           </div>

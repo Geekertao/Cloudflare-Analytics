@@ -18,6 +18,7 @@ const languages = {
         totalRequests: '总请求数',
         totalTraffic: '总流量',
         totalThreats: '总威胁数',
+        activeZones: '活跃Zone数',
 
         // Cache Stats
         requestCacheStats: '请求缓存统计',
@@ -46,6 +47,10 @@ const languages = {
         threats: '威胁数',
         date: '日期',
         time: '时间',
+        hour: '小时',
+        day: '天',
+        dateFormat: '月/日',
+        timeFormat: '月/日 时:00',
 
         // Loading & Error
         loading: '正在加载数据...',
@@ -88,6 +93,7 @@ const languages = {
         totalRequests: 'Total Requests',
         totalTraffic: 'Total Traffic',
         totalThreats: 'Total Threats',
+        activeZones: 'Active Zones',
 
         // Cache Stats
         requestCacheStats: 'Request Cache Statistics',
@@ -116,6 +122,10 @@ const languages = {
         threats: 'Threats',
         date: 'Date',
         time: 'Time',
+        hour: 'Hour',
+        day: 'Day',
+        dateFormat: 'MM/DD',
+        timeFormat: 'MM/DD HH:00',
 
         // Loading & Error
         loading: 'Loading data...',
