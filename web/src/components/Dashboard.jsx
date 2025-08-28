@@ -4,6 +4,7 @@ import CacheStats from './CacheStats';
 import GeographyStats from './GeographyStats';
 import LineChart from './LineChart';
 import LanguageSwitch from './LanguageSwitch';
+import ThemeSwitch from './ThemeSwitch';
 import { useLanguage } from '../contexts/LanguageContext';
 
 const Dashboard = ({ accounts, selectedPeriod, onPeriodChange }) => {
@@ -70,6 +71,32 @@ const Dashboard = ({ accounts, selectedPeriod, onPeriodChange }) => {
             // 小时级数据：1天=24小时，3天=72小时
             const periodHours = selectedPeriod === '1day' ? 24 : 72;
             periodData = sortedData.slice(-Math.min(sortedData.length, periodHours));
+            
+            /* ====== FORK用户专用功能：从今天00点开始的单日数据 ======
+             * 如果您在后端启用了从今天00点开始的功能，
+             * 请取消注释下面的代码块，并注释掉上面的默认代码。
+             * 
+             * 这将确保单日数据只显示从今天00:00开始的数据。
+             */
+            /*
+            if (selectedPeriod === '1day') {
+              // 从今天00点开始的单日数据过滤
+              const todayStart = new Date();
+              todayStart.setHours(0, 0, 0, 0); // 今天00:00:00
+              
+              console.log(`过滤单日数据，从 ${todayStart.toISOString()} 开始`);
+              
+              periodData = sortedData.filter(d => {
+                const dataTime = new Date(d.dimensions.datetime);
+                return dataTime >= todayStart;
+              });
+              
+              console.log(`过滤后的单日数据: ${periodData.length} 条记录`);
+            } else {
+              // 3天数据保持原逻辑
+              periodData = sortedData.slice(-72);
+            }
+            */
           } else {
             // 天级数据：7天或30天
             const periodDays = selectedPeriod === '7days' ? 7 : 30;
@@ -127,7 +154,10 @@ const Dashboard = ({ accounts, selectedPeriod, onPeriodChange }) => {
               <img src="/favicon.svg" alt="Cloudflare" className="dashboard-icon" />
               {t('dashboardTitle')}
             </h1>
-            <LanguageSwitch />
+            <div className="header-controls">
+              <ThemeSwitch />
+              <LanguageSwitch />
+            </div>
           </div>
           <p className="dashboard-subtitle">{t('noData')}</p>
         </div>
@@ -140,30 +170,35 @@ const Dashboard = ({ accounts, selectedPeriod, onPeriodChange }) => {
       {/* 浮动按钮组 */}
       {showFloatingButtons && (
         <div className="floating-period-selector">
-          <button
-            className={`floating-period-button ${selectedPeriod === '1day' ? 'active' : ''}`}
-            onClick={() => onPeriodChange('1day')}
-          >
-            {t('singleDay')}
-          </button>
-          <button
-            className={`floating-period-button ${selectedPeriod === '3days' ? 'active' : ''}`}
-            onClick={() => onPeriodChange('3days')}
-          >
-            {t('threeDays')}
-          </button>
-          <button
-            className={`floating-period-button ${selectedPeriod === '7days' ? 'active' : ''}`}
-            onClick={() => onPeriodChange('7days')}
-          >
-            {t('sevenDays')}
-          </button>
-          <button
-            className={`floating-period-button ${selectedPeriod === '30days' ? 'active' : ''}`}
-            onClick={() => onPeriodChange('30days')}
-          >
-            {t('thirtyDays')}
-          </button>
+          <div className="floating-theme-switch">
+            <ThemeSwitch />
+          </div>
+          <div className="floating-period-buttons">
+            <button
+              className={`floating-period-button ${selectedPeriod === '1day' ? 'active' : ''}`}
+              onClick={() => onPeriodChange('1day')}
+            >
+              {t('singleDay')}
+            </button>
+            <button
+              className={`floating-period-button ${selectedPeriod === '3days' ? 'active' : ''}`}
+              onClick={() => onPeriodChange('3days')}
+            >
+              {t('threeDays')}
+            </button>
+            <button
+              className={`floating-period-button ${selectedPeriod === '7days' ? 'active' : ''}`}
+              onClick={() => onPeriodChange('7days')}
+            >
+              {t('sevenDays')}
+            </button>
+            <button
+              className={`floating-period-button ${selectedPeriod === '30days' ? 'active' : ''}`}
+              onClick={() => onPeriodChange('30days')}
+            >
+              {t('thirtyDays')}
+            </button>
+          </div>
         </div>
       )}
 
@@ -174,7 +209,10 @@ const Dashboard = ({ accounts, selectedPeriod, onPeriodChange }) => {
             <img src="/favicon.svg" alt="Cloudflare" className="dashboard-icon" />
             {t('dashboardTitle')}
           </h1>
-          <LanguageSwitch />
+          <div className="header-controls">
+            <ThemeSwitch />
+            <LanguageSwitch />
+          </div>
         </div>
         <p className="dashboard-subtitle">{t('dashboardSubtitle')}</p>
         

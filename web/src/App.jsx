@@ -2,13 +2,16 @@ import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import Dashboard from './components/Dashboard';
 import { LanguageProvider, useLanguage } from './contexts/LanguageContext';
+import { ThemeProvider } from './contexts/ThemeContext';
 import './App.css';
 
 export default function App() {
   return (
-    <LanguageProvider>
-      <AppContent />
-    </LanguageProvider>
+    <ThemeProvider>
+      <LanguageProvider>
+        <AppContent />
+      </LanguageProvider>
+    </ThemeProvider>
   );
 }
 

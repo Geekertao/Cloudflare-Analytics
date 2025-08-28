@@ -104,7 +104,7 @@ const CacheStats = ({
           {/* 数据说明 */}
           <div style={{ flex: 1 }}>
             <div className="cache-item">
-              <span className="cache-label">{t('cachedRequests')}：</span>
+              <span className="cache-label" style={{ color: colors[0] }}>{t('cachedRequests')}：</span>
               <div>
                 <span className="cache-value">{formatNumber(totalCachedRequests)}</span>
                 <span className="cache-percentage">({cacheRequestsRatio}%)</span>
@@ -112,7 +112,7 @@ const CacheStats = ({
             </div>
             
             <div className="cache-item">
-              <span className="cache-label">{t('uncachedRequests')}：</span>
+              <span className="cache-label" style={{ color: colors[1] }}>{t('uncachedRequests')}：</span>
               <div>
                 <span className="cache-value">{formatNumber(totalRequests - totalCachedRequests)}</span>
                 <span className="cache-percentage">({(100 - parseFloat(cacheRequestsRatio)).toFixed(1)}%)</span>
@@ -152,7 +152,7 @@ const CacheStats = ({
           {/* 数据说明 */}
           <div style={{ flex: 1 }}>
             <div className="cache-item">
-              <span className="cache-label">{t('cachedBandwidth')}：</span>
+              <span className="cache-label" style={{ color: colors[0] }}>{t('cachedBandwidth')}：</span>
               <div>
                 <span className="cache-value">{formatBytes(totalCachedBytes)}</span>
                 <span className="cache-percentage">({cacheBytesRatio}%)</span>
@@ -160,7 +160,7 @@ const CacheStats = ({
             </div>
             
             <div className="cache-item">
-              <span className="cache-label">{t('uncachedBandwidth')}：</span>
+              <span className="cache-label" style={{ color: colors[1] }}>{t('uncachedBandwidth')}：</span>
               <div>
                 <span className="cache-value">{formatBytes(totalBytes - totalCachedBytes)}</span>
                 <span className="cache-percentage">({(100 - parseFloat(cacheBytesRatio)).toFixed(1)}%)</span>

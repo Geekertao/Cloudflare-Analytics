@@ -64,8 +64,11 @@ const languages = {
         geographyStats: '地理位置统计',
         topCountriesRegions: '访问量前5的国家和地区',
         requestsByCountry: '各国家/地区请求数量',
+        bandwidthByCountry: '各国家/地区带宽使用量',
+        requestDistribution: '请求数分布',
         detailedStats: '详细统计',
         countryRegion: '国家/地区',
+        bandwidth: '带宽',
         noGeographyData: '暂无地理位置数据'
     },
     en: {
@@ -130,8 +133,11 @@ const languages = {
         geographyStats: 'Geography Statistics',
         topCountriesRegions: 'Top 5 Countries and Regions by Traffic',
         requestsByCountry: 'Requests by Country/Region',
+        bandwidthByCountry: 'Bandwidth by Country/Region',
+        requestDistribution: 'Request Distribution',
         detailedStats: 'Detailed Statistics',
         countryRegion: 'Country/Region',
+        bandwidth: 'Bandwidth',
         noGeographyData: 'No geography data available'
     }
 };

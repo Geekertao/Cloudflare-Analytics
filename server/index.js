@@ -287,6 +287,30 @@ async function updateData() {
           const hoursSince = new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString(); // 3天前
           const hoursUntil = new Date().toISOString(); // 现在
 
+          /* ====== FORK用户专用功能：从今天00点开始的单日数据 ======
+           * 如果您希望单日数据从今天00点开始显示而不是最近24小时，
+           * 请取消注释下面的代码块，并注释掉上面的默认代码。
+           * 
+           * 注意：这将改变单日数据的显示方式，从“过去24小时”改为“今天从00:00开始”
+           * 同时需要在前端相应地修改数据处理逻辑。
+           */
+          /*
+          // 获取小时级数据 - 自定义版本：从今天00点开始
+          const now = new Date();
+          const todayStart = new Date();
+          todayStart.setHours(0, 0, 0, 0); // 今天00:00:00
+          
+          // 为了获取足够的历史数据，仍然获取最近3天
+          const hoursStartDate = new Date(todayStart);
+          hoursStartDate.setDate(hoursStartDate.getDate() - 2); // 从3天前开始获取
+
+          const hoursSince = hoursStartDate.toISOString();
+          const hoursUntil = now.toISOString();
+          
+          console.log(`    查询小时级数据时间范围（今天00点模式）: ${hoursSince} 到 ${hoursUntil}`);
+          console.log(`    今天开始时间: ${todayStart.toISOString()}`);
+          */
+
           console.log(`    查询小时级数据时间范围: ${hoursSince} 到 ${hoursUntil}`);
 
           const hoursQuery = `
@@ -313,7 +337,7 @@ async function updateData() {
               }
             }`;
 
-          // 获取地理位置数据（仅今天，严格符合API限制）
+          // 获取地理位置数据（仅今天，遵循API时间范围限制）
           const today = new Date().toISOString().slice(0, 10); // 今天日期
           const geoSince = today; // 从今天开始
           const geoUntil = today; // 到今天结束
@@ -324,13 +348,19 @@ async function updateData() {
             query($zone: String!, $since: Date!, $until: Date!) {
               viewer {
                 zones(filter: {zoneTag: $zone}) {
-                  httpRequestsAdaptiveGroups(
+                  httpRequests1dGroups(
                     filter: {date_geq: $since, date_leq: $until}
-                    limit: 15
+                    limit: 100
+                    orderBy: [date_DESC]
                   ) {
-                    count
                     dimensions {
+                      date
                       clientCountryName
+                    }
+                    sum {
+                      requests
+                      bytes
+                      threats
                     }
                   }
                 }
@@ -414,13 +444,35 @@ async function updateData() {
             if (!zoneData.error) {
               zoneData.error = geoRes.data.errors[0]?.message || '地理位置数据API请求失败';
             }
-          } else if (geoRes.data.data?.viewer?.zones?.[0]?.httpRequestsAdaptiveGroups) {
-            const rawGeoData = geoRes.data.data.viewer.zones[0].httpRequestsAdaptiveGroups;
+          } else if (geoRes.data.data?.viewer?.zones?.[0]?.httpRequests1dGroups) {
+            const rawGeoData = geoRes.data.data.viewer.zones[0].httpRequests1dGroups;
             console.log(`    Zone ${z.domain} 地理位置数据获取成功: ${rawGeoData.length} 条记录`);
-            zoneData.geography = rawGeoData;
 
-            if (rawGeoData.length > 0) {
-              const topCountries = rawGeoData.slice(0, 5).map(d => `${d.dimensions.clientCountryName}: ${d.count}`);
+            // 聚合地理位置数据（按国家汇总今日数据）
+            const countryStats = {};
+            rawGeoData.forEach(record => {
+              const country = record.dimensions?.clientCountryName;
+              if (country && country !== 'Unknown' && country !== '') {
+                if (!countryStats[country]) {
+                  countryStats[country] = {
+                    dimensions: { clientCountryName: country },
+                    sum: { requests: 0, bytes: 0, threats: 0 }
+                  };
+                }
+                countryStats[country].sum.requests += record.sum?.requests || 0;
+                countryStats[country].sum.bytes += record.sum?.bytes || 0;
+                countryStats[country].sum.threats += record.sum?.threats || 0;
+              }
+            });
+
+            // 转换为数组并排序
+            zoneData.geography = Object.values(countryStats)
+              .sort((a, b) => b.sum.requests - a.sum.requests)
+              .slice(0, 15); // 只保留前15个国家
+
+            if (zoneData.geography.length > 0) {
+              const topCountries = zoneData.geography.slice(0, 5).map(d =>
+                `${d.dimensions.clientCountryName}: ${d.sum.requests}`);
               console.log(`    前5个国家/地区: ${topCountries.join(', ')}`);
             }
           }

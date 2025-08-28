@@ -71,6 +71,11 @@ const CFLineChart = ({ domain, raw, rawHours, selectedPeriod }) => {
   }
 
   // 把API数据转成 Recharts 需要的数据格式
+  /* ====== FORK用户注意 ======
+   * 如果您在Dashboard.jsx中启用了从今天00点开始的功能，
+   * 这里会自动接收到经过时间过滤的数据，无需修改此文件。
+   * 数据过滤逻辑已在Dashboard组件中处理完成。
+   */
   const data = sourceData
     .filter(d => d && d.dimensions && d.sum) // 过滤无效数据
     .map((d) => {
