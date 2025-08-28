@@ -78,8 +78,8 @@ const GeographyStats = ({ data, formatNumber, formatBytes }) => {
   // 计算总请求数用于百分比计算
   const totalRequests = topCountries.reduce((sum, country) => sum + country.requests, 0);
 
-  // 自定义Tooltip - 请求数柱状图
-  const RequestsTooltip = ({ active, payload, label }) => {
+  // 自定义Tooltip - 双柱状图
+  const CombinedTooltip = ({ active, payload, label }) => {
     if (active && payload && payload.length) {
       const data = payload[0].payload;
       return (
@@ -93,29 +93,8 @@ const GeographyStats = ({ data, formatNumber, formatBytes }) => {
           <p style={{ margin: '0 0 8px 0', fontWeight: '600', color: themeColors.text }}>
             {data.country}
           </p>
-          <p style={{ margin: '0', color: themeColors.textSecondary }}>
+          <p style={{ margin: '0 0 4px 0', color: themeColors.textSecondary }}>
             {t('requests')}: {formatNumber(data.requests)}
-          </p>
-        </div>
-      );
-    }
-    return null;
-  };
-
-  // 自定义Tooltip - 带宽柱状图
-  const BandwidthTooltip = ({ active, payload, label }) => {
-    if (active && payload && payload.length) {
-      const data = payload[0].payload;
-      return (
-        <div style={{
-          backgroundColor: themeColors.background,
-          padding: '12px',
-          border: `1px solid ${themeColors.border}`,
-          borderRadius: '8px',
-          boxShadow: isDarkMode ? '0 4px 12px rgba(0,0,0,0.4)' : '0 4px 12px rgba(0,0,0,0.1)'
-        }}>
-          <p style={{ margin: '0 0 8px 0', fontWeight: '600', color: themeColors.text }}>
-            {data.country}
           </p>
           <p style={{ margin: '0', color: themeColors.textSecondary }}>
             {t('bandwidth')}: {formatBytes(data.bytes)}
@@ -146,81 +125,61 @@ const GeographyStats = ({ data, formatNumber, formatBytes }) => {
         <h2>{t('geographyStats')}</h2>
         <p className="section-subtitle">{t('topCountriesRegions')}</p>
       </div>
-      {/* 双柱状图容器 */}
-      <div className="charts-container">
-        {/* 请求数柱状图 */}
-        <div className="chart-item">
-          <h3>{t('requestsByCountry')}</h3>
-          <ResponsiveContainer width="100%" height={300}>
-            <BarChart
-              data={topCountries}
-              margin={{
-                top: 20,
-                right: 30,
-                left: 20,
-                bottom: 60
-              }}
-            >
-              <CartesianGrid 
-                strokeDasharray="3 3" 
-                opacity={0.3}
-                stroke={themeColors.grid}
-              />
-              <XAxis 
-                dataKey="country" 
-                angle={-45}
-                textAnchor="end"
-                height={80}
-                interval={0}
-                tick={{ fontSize: 12, fill: themeColors.textSecondary }}
-              />
-              <YAxis tick={{ fontSize: 12, fill: themeColors.textSecondary }} />
-              <Tooltip content={<RequestsTooltip />} />
-              <Bar 
-                dataKey="requests" 
-                fill={themeColors.chartColors.requests}
-                radius={[4, 4, 0, 0]}
-              />
-            </BarChart>
-          </ResponsiveContainer>
-        </div>
-
-        {/* 带宽柱状图 */}
-        <div className="chart-item">
-          <h3>{t('bandwidthByCountry')}</h3>
-          <ResponsiveContainer width="100%" height={300}>
-            <BarChart
-              data={topCountries}
-              margin={{
-                top: 20,
-                right: 30,
-                left: 20,
-                bottom: 60
-              }}
-            >
-              <CartesianGrid 
-                strokeDasharray="3 3" 
-                opacity={0.3}
-                stroke={themeColors.grid}
-              />
-              <XAxis 
-                dataKey="country" 
-                angle={-45}
-                textAnchor="end"
-                height={80}
-                interval={0}
-                tick={{ fontSize: 12, fill: themeColors.textSecondary }}
-              />
-              <YAxis tick={{ fontSize: 12, fill: themeColors.textSecondary }} />
-              <Tooltip content={<BandwidthTooltip />} />
-              <Bar 
-                dataKey="bytes" 
-                fill={themeColors.chartColors.bandwidth}
-                radius={[4, 4, 0, 0]}
-              />
-            </BarChart>
-          </ResponsiveContainer>
-        </div>
+      {/* 合并的双柱状图 */}
+      <div className="chart-container">
+        <h3>{t('trafficByCountry')}</h3>
+        <ResponsiveContainer width="100%" height={400}>
+          <BarChart
+            data={topCountries}
+            margin={{
+              top: 20,
+              right: 30,
+              left: 20,
+              bottom: 60
+            }}
+          >
+            <CartesianGrid 
+              strokeDasharray="3 3" 
+              opacity={0.3}
+              stroke={themeColors.grid}
+            />
+            <XAxis 
+              dataKey="country" 
+              angle={-45}
+              textAnchor="end"
+              height={80}
+              interval={0}
+              tick={{ fontSize: 12, fill: themeColors.textSecondary }}
+            />
+            <YAxis 
+              yAxisId="requests"
+              orientation="left"
+              tick={{ fontSize: 12, fill: themeColors.textSecondary }}
+              label={{ value: t('requests'), angle: -90, position: 'insideLeft', style: { textAnchor: 'middle', fill: themeColors.textSecondary } }}
+            />
+            <YAxis 
+              yAxisId="bandwidth"
+              orientation="right"
+              tick={{ fontSize: 12, fill: themeColors.textSecondary }}
+              label={{ value: t('bandwidth'), angle: 90, position: 'insideRight', style: { textAnchor: 'middle', fill: themeColors.textSecondary } }}
+            />
+            <Tooltip content={<CombinedTooltip />} />
+            <Bar 
+              yAxisId="requests"
+              dataKey="requests" 
+              fill={themeColors.chartColors.requests}
+              radius={[4, 4, 0, 0]}
+              name={t('requests')}
+            />
+            <Bar 
+              yAxisId="bandwidth"
+              dataKey="bytes" 
+              fill={themeColors.chartColors.bandwidth}
+              radius={[4, 4, 0, 0]}
+              name={t('bandwidth')}
+            />
+          </BarChart>
+        </ResponsiveContainer>
       </div>
 
       {/* 统计列表 */}

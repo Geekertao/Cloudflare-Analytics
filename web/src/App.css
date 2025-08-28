@@ -776,6 +776,19 @@
 
 
 
+/* 单一图表容器 */
+.chart-container {
+  margin-bottom: 24px;
+}
+
+.chart-container h3 {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0 0 16px 0;
+  text-align: center;
+}
+
 /* 双柱状图容器 */
 .charts-container {
   display: grid;
