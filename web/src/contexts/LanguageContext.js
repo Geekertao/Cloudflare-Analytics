@@ -4,8 +4,7 @@ import React, { createContext, useContext, useState, useEffect } from 'react';
 const languages = {
     zh: {
         // Dashboard
-        dashboardTitle: 'Cloudflare 分析数据',
-        dashboardSubtitle: 'Cloudflare流量分析仪表盘',
+        dashboardTitle: 'Cloudflare流量分析仪表盘',
         noData: '暂无数据',
 
         // Period Selector
@@ -51,6 +50,14 @@ const languages = {
         day: '天',
         dateFormat: '月/日',
         timeFormat: '月/日 时:00',
+        dataRangeLabel: '数据范围',
+        timeLabel: '时间',
+        dateLabel: '日期',
+        noHourlyDataFallback: '暂无小时级数据',
+        noDailyDataFallback: '暂无天级数据',
+        useDailyDataInstead: '使用天级数据代替',
+        useDailyDataButton: '使用天级数据显示',
+        to: '至',
 
         // Loading & Error
         loading: '正在加载数据...',
@@ -75,12 +82,16 @@ const languages = {
         detailedStats: '详细统计',
         countryRegion: '国家/地区',
         bandwidth: '带宽',
-        noGeographyData: '暂无地理位置数据'
+        noGeographyData: '暂无地理位置数据',
+        
+        // 移动端简化标签(保持准确性)
+        countryShort: '国家/地区',
+        requestsShort: '请求',
+        bandwidthShort: '流量',
     },
     en: {
         // Dashboard
-        dashboardTitle: 'Cloudflare Analytics',
-        dashboardSubtitle: 'Cloudflare Traffic Analytics Dashboard',
+        dashboardTitle: 'Cloudflare Traffic Analytics Dashboard',
         noData: 'No Data Available',
 
         // Period Selector
@@ -126,6 +137,14 @@ const languages = {
         day: 'Day',
         dateFormat: 'MM/DD',
         timeFormat: 'MM/DD HH:00',
+        dataRangeLabel: 'Data Range',
+        timeLabel: 'Time',
+        dateLabel: 'Date',
+        noHourlyDataFallback: 'No hourly data available',
+        noDailyDataFallback: 'No daily data available',
+        useDailyDataInstead: '(Use daily data instead)',
+        useDailyDataButton: 'Use Daily Data Display',
+        to: 'to',
 
         // Loading & Error
         loading: 'Loading data...',
@@ -150,7 +169,12 @@ const languages = {
         detailedStats: 'Detailed Statistics',
         countryRegion: 'Country/Region',
         bandwidth: 'Bandwidth',
-        noGeographyData: 'No geography data available'
+        noGeographyData: 'No geography data available',
+        
+        // 移动端简化标签(保持准确性)
+        countryShort: 'Country/Region',
+        requestsShort: 'Requests',
+        bandwidthShort: 'Traffic',
     }
 };
 
@@ -174,8 +198,8 @@ export const LanguageProvider = ({ children }) => {
     useEffect(() => {
         // 更新页面标题
         document.title = currentLanguage === 'zh' ?
-            'Cloudflare 分析数据 - 流量分析仪表盘' :
-            'Cloudflare Analytics - Traffic Analytics Dashboard';
+            'Cloudflare流量分析仪表盘' :
+            'Cloudflare Traffic Analytics Dashboard';
     }, [currentLanguage]);
 
     return (

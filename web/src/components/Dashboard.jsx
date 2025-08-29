@@ -157,7 +157,7 @@ const Dashboard = ({ accounts, selectedPeriod, onPeriodChange }) => {
             <ThemeSwitch />
             <LanguageSwitch />
           </div>
-          <p className="dashboard-subtitle">{t('noData')}</p>
+          <p className="no-data-message">{t('noData')}</p>
         </div>
       </div>
     );
@@ -168,8 +168,9 @@ const Dashboard = ({ accounts, selectedPeriod, onPeriodChange }) => {
       {/* 浮动按钮组 */}
       {showFloatingButtons && (
         <div className="floating-period-selector">
-          <div className="floating-theme-switch">
+          <div className="floating-controls">
             <ThemeSwitch />
+            <LanguageSwitch />
           </div>
           <div className="floating-period-buttons">
             <button
@@ -206,7 +207,6 @@ const Dashboard = ({ accounts, selectedPeriod, onPeriodChange }) => {
           <img src="/favicon.svg" alt="Cloudflare" className="dashboard-icon" />
           {t('dashboardTitle')}
         </h1>
-        <p className="dashboard-subtitle">{t('dashboardSubtitle')}</p>
         
         {/* 主题和语言控制器 */}
         <div className="header-controls">

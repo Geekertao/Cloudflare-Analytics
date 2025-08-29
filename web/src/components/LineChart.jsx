@@ -13,7 +13,7 @@ import { useLanguage } from '../contexts/LanguageContext';
 import { useTheme } from '../contexts/ThemeContext';
 
 const CFLineChart = ({ domain, raw, rawHours, selectedPeriod }) => {
-  const { t } = useLanguage();
+  const { t, isZh } = useLanguage();
   const { isDarkMode } = useTheme();
   
   // 主题相关的颜色配置
@@ -66,9 +66,9 @@ const CFLineChart = ({ domain, raw, rawHours, selectedPeriod }) => {
           textAlign: 'center',
           padding: '40px 0'
         }}>
-          暂无{useHourlyData ? '小时级' : '天级'}数据
+          {useHourlyData ? t('noHourlyDataFallback') : t('noDailyDataFallback')}
           {useHourlyData && raw && raw.length > 0 && (
-            <><br /><small>（使用天级数据代替）</small></>
+            <><br /><small>{t('useDailyDataInstead')}</small></>
           )}
         </p>
         {useHourlyData && raw && raw.length > 0 && (
@@ -84,7 +84,7 @@ const CFLineChart = ({ domain, raw, rawHours, selectedPeriod }) => {
                 cursor: 'pointer'
               }}
             >
-              使用天级数据显示
+              {t('useDailyDataButton')}
             </button>
           </div>
         )}
@@ -107,16 +107,27 @@ const CFLineChart = ({ domain, raw, rawHours, selectedPeriod }) => {
         // 小时级数据使用datetime
         date = d.dimensions.datetime;
         const dateObj = new Date(date);
-        formattedDate = `${dateObj.getMonth() + 1}/${dateObj.getDate()} ${dateObj.getHours()}:00`;
+        if (isZh) {
+          formattedDate = `${dateObj.getMonth() + 1}/${dateObj.getDate()} ${dateObj.getHours()}:00`;
+        } else {
+          formattedDate = `${(dateObj.getMonth() + 1).toString().padStart(2, '0')}/${dateObj.getDate().toString().padStart(2, '0')} ${dateObj.getHours().toString().padStart(2, '0')}:00`;
+        }
         originalDate = date;
       } else {
         // 天级数据使用date
         date = d.dimensions.date;
         const dateObj = new Date(date);
-        formattedDate = dateObj.toLocaleDateString('zh-CN', {
-          month: 'short',
-          day: 'numeric'
-        });
+        if (isZh) {
+          formattedDate = dateObj.toLocaleDateString('zh-CN', {
+            month: 'short',
+            day: 'numeric'
+          });
+        } else {
+          formattedDate = dateObj.toLocaleDateString('en-US', {
+            month: 'short',
+            day: 'numeric'
+          });
+        }
         originalDate = date;
       }
       
@@ -191,7 +202,7 @@ const CFLineChart = ({ domain, raw, rawHours, selectedPeriod }) => {
           boxShadow: isDarkMode ? '0 4px 12px rgba(0,0,0,0.4)' : '0 4px 12px rgba(0,0,0,0.1)'
         }}>
           <p style={{ margin: '0 0 8px 0', fontWeight: '600', color: themeColors.text }}>
-            {useHourlyData ? `时间: ${label}` : `日期: ${label}`}
+            {useHourlyData ? `${t('timeLabel')}: ${label}` : `${t('dateLabel')}: ${label}`}
           </p>
           {payload.map((entry, index) => {
             let value = entry.value;
@@ -273,10 +284,10 @@ const CFLineChart = ({ domain, raw, rawHours, selectedPeriod }) => {
             margin: 0,
             fontSize: '14px'
           }}>
-            数据范围: {data.length > 0 ? 
+            {t('dataRangeLabel')}: {data.length > 0 ? 
               useHourlyData ? 
-                `${new Date(data[0].originalDate).toLocaleString('zh-CN')} 至 ${new Date(data[data.length - 1].originalDate).toLocaleString('zh-CN')}` :
-                `${data[0].originalDate} 至 ${data[data.length - 1].originalDate}` 
+                `${new Date(data[0].originalDate).toLocaleString(isZh ? 'zh-CN' : 'en-US')} ${t('to')} ${new Date(data[data.length - 1].originalDate).toLocaleString(isZh ? 'zh-CN' : 'en-US')}` :
+                `${data[0].originalDate} ${t('to')} ${data[data.length - 1].originalDate}` 
               : 'N/A'}
           </p>
         </div>

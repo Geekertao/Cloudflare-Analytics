@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { useLanguage } from '../contexts/LanguageContext';
 import { useTheme } from '../contexts/ThemeContext';
@@ -6,6 +6,19 @@ import { useTheme } from '../contexts/ThemeContext';
 const GeographyStats = ({ data, formatNumber, formatBytes }) => {
   const { t } = useLanguage();
   const { isDarkMode } = useTheme();
+  const [isMobile, setIsMobile] = useState(false);
+  
+  // 检测移动端
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth <= 768);
+    };
+    
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
   
   // 主题相关的颜色配置
   const themeColors = {
@@ -154,14 +167,14 @@ const GeographyStats = ({ data, formatNumber, formatBytes }) => {
       {/* 合并的双柱状图 */}
       <div className="chart-container">
         <h3>{t('trafficByCountry')}</h3>
-        <ResponsiveContainer width="100%" height={400}>
+        <ResponsiveContainer width="100%" height={380}>
           <BarChart
             data={topCountries}
             margin={{
-              top: 20,
+              top: 15,
               right: 30,
               left: 20,
-              bottom: 60
+              bottom: 30
             }}
           >
             <CartesianGrid 
@@ -197,6 +210,7 @@ const GeographyStats = ({ data, formatNumber, formatBytes }) => {
               fill={themeColors.chartColors.requests}
               radius={[4, 4, 0, 0]}
               name={t('requests')}
+              maxBarSize={60}
             />
             <Bar 
               yAxisId="bandwidth"
@@ -204,6 +218,7 @@ const GeographyStats = ({ data, formatNumber, formatBytes }) => {
               fill={themeColors.chartColors.bandwidth}
               radius={[4, 4, 0, 0]}
               name={t('bandwidth')}
+              maxBarSize={60}
             />
           </BarChart>
         </ResponsiveContainer>
@@ -215,9 +230,9 @@ const GeographyStats = ({ data, formatNumber, formatBytes }) => {
         <div className="stats-table">
           <div className="table-header">
             <div className="col-rank">#</div>
-            <div className="col-country">{t('countryRegion')}</div>
-            <div className="col-requests">{t('requests')}</div>
-            <div className="col-bandwidth">{t('bandwidth')}</div>
+            <div className="col-country">{isMobile ? t('countryShort') : t('countryRegion')}</div>
+            <div className="col-requests">{isMobile ? t('requestsShort') : t('requests')}</div>
+            <div className="col-bandwidth">{isMobile ? t('bandwidthShort') : t('bandwidth')}</div>
           </div>
           {topCountries.map((country, index) => {
             const percentage = totalRequests > 0 ? ((country.requests / totalRequests) * 100).toFixed(1) : '0.0';
@@ -227,7 +242,6 @@ const GeographyStats = ({ data, formatNumber, formatBytes }) => {
                   <span className="rank-badge">{index + 1}</span>
                 </div>
                 <div className="col-country">
-                  <span className="country-flag">🌍</span>
                   <span className="country-name">{country.country}</span>
                   <span className="country-percentage">({percentage}%)</span>
                 </div>

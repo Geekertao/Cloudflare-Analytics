@@ -314,36 +314,7 @@
   background: var(--accent-color);
 }
 
-/* 浮动状态下的主题切换按钮 */
-.floating-theme-switch .theme-toggle-btn {
-  padding: 2px;
-  border-radius: 4px;
-}
 
-.floating-theme-switch .theme-toggle-track {
-  width: 38px;
-  height: 20px;
-  border-radius: 10px;
-}
-
-.floating-theme-switch .theme-toggle-thumb {
-  width: 16px;
-  height: 16px;
-  top: 2px;
-}
-
-.floating-theme-switch .theme-toggle-thumb.light {
-  left: 2px;
-}
-
-.floating-theme-switch .theme-toggle-thumb.dark {
-  left: 20px;
-}
-
-.floating-theme-switch .theme-toggle-thumb svg {
-  width: 12px;
-  height: 12px;
-}
 
 .dashboard-icon {
   width: 40px;
@@ -407,11 +378,92 @@
   padding: var(--spacing-sm);
 }
 
-.floating-theme-switch {
+.floating-controls {
   display: flex;
   align-items: center;
+  gap: var(--spacing-md);
   padding: 0 var(--spacing-sm);
   border-right: 1px solid var(--border-color);
+}
+
+.floating-controls .theme-switch {
+  display: flex;
+  align-items: center;
+}
+
+.floating-controls .theme-toggle-btn {
+  padding: 2px;
+  border-radius: 4px;
+}
+
+.floating-controls .theme-toggle-track {
+  width: 38px;
+  height: 20px;
+  border-radius: 10px;
+}
+
+.floating-controls .theme-toggle-thumb {
+  width: 16px;
+  height: 16px;
+  top: 2px;
+}
+
+.floating-controls .theme-toggle-thumb.light {
+  left: 2px;
+}
+
+.floating-controls .theme-toggle-thumb.dark {
+  left: 20px;
+}
+
+.floating-controls .theme-toggle-thumb svg {
+  width: 12px;
+  height: 12px;
+}
+
+.floating-controls .language-switch {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+}
+
+.floating-controls .language-buttons {
+  display: flex;
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.floating-controls .language-button {
+  padding: 4px 8px;
+  border: none;
+  background: var(--card-bg);
+  color: var(--text-secondary);
+  font-size: 10px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  border-right: 1px solid var(--border-color);
+  min-width: 24px;
+  text-align: center;
+}
+
+.floating-controls .language-button:last-child {
+  border-right: none;
+}
+
+.floating-controls .language-button:hover {
+  background: var(--bg-secondary);
+  color: var(--text-primary);
+}
+
+.floating-controls .language-button.active {
+  background: var(--accent-color);
+  color: white;
+}
+
+.floating-controls .language-button.active:hover {
+  background: var(--accent-hover);
 }
 
 .floating-period-buttons {
@@ -696,7 +748,7 @@
     flex-direction: column;
   }
 
-  .floating-theme-switch {
+  .floating-controls {
     border-right: none;
     border-bottom: 1px solid var(--border-color);
     padding: var(--spacing-sm) 0;
@@ -814,7 +866,7 @@
 
 /* 单一图表容器 */
 .chart-container {
-  margin-bottom: var(--spacing-xl);
+  margin-bottom: 0;
 }
 
 .chart-container h3 {
@@ -854,7 +906,7 @@
   font-size: 1rem;
   font-weight: 600;
   color: var(--text-primary);
-  margin: 0 0 var(--spacing-lg) 0;
+  margin: 0;
   letter-spacing: -0.025em;
 }
 
@@ -972,6 +1024,19 @@
     margin-bottom: var(--spacing-lg);
   }
 
+  .chart-container {
+    margin-bottom: 0;
+  }
+
+  .chart-container .recharts-responsive-container {
+    height: 350px !important;
+  }
+
+  .geography-list h3 {
+    font-size: 1rem;
+    margin: 0;
+  }
+
   /* 移动端双柱状图布局 */
   .charts-container {
     grid-template-columns: 1fr;
@@ -983,12 +1048,34 @@
     padding: var(--spacing-sm);
   }
   
+  /* 移动端表格优化 */
+  .stats-table {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    font-size: 0.6rem;
+  }
+  
+  .geography-list h3 {
+    font-size: 1rem;
+    margin-bottom: 2px;
+  }
+  
   .table-header,
   .table-row {
-    grid-template-columns: 30px 1fr 80px 80px;
+    grid-template-columns: 25px 1fr 60px 60px;
     padding: var(--spacing-xs);
-    gap: var(--spacing-xs);
-    font-size: 0.75rem;
+    gap: 4px;
+    font-size: 0.7rem;
+    min-width: 300px;
+  }
+  
+  .table-header {
+    font-size: 0.6rem;
+    position: sticky;
+    top: 0;
+    z-index: 1;
+    text-transform: none;
+    line-height: 1.2;
   }
   
   .rank-badge {
@@ -1002,13 +1089,36 @@
   }
 
   .country-percentage {
-    display: none;
+    font-size: 0.55rem;
+    color: var(--text-secondary);
+    margin-left: 2px;
+  }
+  
+  .country-flag {
+    font-size: 0.8rem;
+    margin-right: 2px;
   }
   
   .col-requests,
   .col-traffic,
   .col-threats,
   .col-bandwidth {
-    font-size: 0.6875rem;
+    font-size: 0.6rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    text-align: center;
+    padding: 2px;
+  }
+  
+  .country-name {
+    font-size: 0.7rem;
+    line-height: 1.1;
+  }
+  
+  .rank-badge {
+    width: 14px;
+    height: 14px;
+    font-size: 0.55rem;
   }
 }
