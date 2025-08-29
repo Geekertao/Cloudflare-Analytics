@@ -83,9 +83,8 @@ async function validateToken(token, zoneName) {
     const testQuery = `
       query {
         viewer {
-          zones(limit: 1) {
+          zones(limit: 50) {
             zoneTag
-            name
           }
         }
       }`;
@@ -160,8 +159,6 @@ async function getZoneInfo(token, zoneId) {
         viewer {
           zones(filter: {zoneTag: $zoneId}) {
             zoneTag
-            name
-            status
           }
         }
       }`;

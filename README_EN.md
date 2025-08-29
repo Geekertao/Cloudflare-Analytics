@@ -126,6 +126,41 @@ To use this dashboard, you need to create a Cloudflare API Token with the follow
 
 You can create the token at: https://dash.cloudflare.com/profile/api-tokens
 
+### 📋 Token Permissions vs Configured Zones
+
+**Important Note**: Token permissions and actually configured zones are two different concepts:
+
+#### Token Permission Scope
+
+- Your Cloudflare API Token may have permission to access **all zones** under your account
+- During token validation, you'll see something like: `Token can access 10 zones`
+- This means your account has 10 total zones, and the token can access all of them
+
+#### Project Configured Zones
+
+- You can **selectively configure** which zones you want to monitor
+- For example: Configure only 3 important zones for monitoring
+- The system will show: `Configuration loaded successfully: 1 account (3 zones)`
+
+#### Validation Log Example
+
+```bash
+[Token Validation] Token can access 10 zones              # ← Token permission scope
+✓ Account Geekertao token validation successful, can access 10 zones
+  ✓ Zone geekertao.top (xxx) accessible                   # ← Specific configured zones
+  ✓ Zone dpik.top (xxx) accessible
+  ✓ Zone felicity.ac.cn (xxx) accessible
+
+Configuration loaded successfully: 1 account (3 zones)    # ← Actually monitored zone count
+```
+
+**Advantages** of this design:
+
+- 🔒 **Security**: Token permission validation ensures all configured zones are accessible
+- 🎯 **Flexibility**: You can choose to monitor only important zones, avoiding information overload
+- 📊 **Performance**: Reduces unnecessary data fetching, improving system response speed
+- 🔧 **Scalability**: Easy to add more zones to monitoring list in the future
+
 ### Data Update Frequency
 
 - Backend data updates: **Every 2 hours**

@@ -61,10 +61,8 @@ async function diagnoseToken(token) {
                 query: `
           query {
             viewer {
-              zones(limit: 10) {
+              zones(limit: 50) {
                 zoneTag
-                name
-                status
               }
             }
           }
@@ -87,7 +85,7 @@ async function diagnoseToken(token) {
         const zones = zoneResponse.data.data.viewer.zones;
         console.log(`✅ 可访问 ${zones.length} 个Zone:`);
         zones.forEach(zone => {
-            console.log(`   - ${zone.name} (${zone.zoneTag}) [${zone.status}]`);
+            console.log(`   - ${zone.zoneTag}`);
         });
         console.log('');
 

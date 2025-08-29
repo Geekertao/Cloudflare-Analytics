@@ -128,6 +128,41 @@ docker run -p 80:80 \
 
 您可以在此处创建 Token：https://dash.cloudflare.com/profile/api-tokens
 
+### 📋 Token 权限 vs 配置的 Zone
+
+**重要说明**：Token 权限和实际配置的 Zone 是两个不同的概念：
+
+#### Token 权限范围
+
+- 您的 Cloudflare API Token 可能有权限访问账户下的**所有 Zone**
+- Token 验证时会显示类似：`Token可访问 10 个Zone`
+- 这表示您的账户总共有 10 个 Zone，Token 都可以访问
+
+#### 项目配置的 Zone
+
+- 您可以**选择性地配置**需要监控的 Zone
+- 例如：只配置 3 个重要的 Zone 进行监控
+- 系统会显示：`配置加载成功: 1 个账户 (3 个 zones)`
+
+#### 验证日志示例
+
+```bash
+[Token验证] Token可访问 10 个Zone              # ← Token 权限范围
+✓ 账户 Geekertao Token验证成功，可访问 10 个Zone
+  ✓ Zone geekertao.top (xxx) 可访问            # ← 配置的具体Zone
+  ✓ Zone dpik.top (xxx) 可访问
+  ✓ Zone felicity.ac.cn (xxx) 可访问
+
+配置加载成功: 1 个账户 (3 个 zones)              # ← 实际监控的Zone数量
+```
+
+这种设计的**优势**：
+
+- 🔒 **安全性**：Token 权限验证确保配置的 Zone 都是可访问的
+- 🎯 **灵活性**：您可以选择只监控重要的 Zone，避免信息过载
+- 📊 **性能**：减少不必要的数据获取，提高系统响应速度
+- 🔧 **扩展性**：将来可以轻松添加更多 Zone 到监控列表
+
 ### 数据更新频率
 
 - 后端数据更新：**每 2 小时更新一次**
