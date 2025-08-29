@@ -175,19 +175,32 @@
   border: 1px solid var(--border-color);
 }
 
-.header-top {
+.dashboard-title {
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0 0 var(--spacing-md) 0;
   display: flex;
-  justify-content: space-between;
   align-items: center;
-  margin-bottom: var(--spacing-md);
-  flex-wrap: wrap;
-  gap: var(--spacing-lg);
+  justify-content: center;
+  gap: var(--spacing-sm);
+  letter-spacing: -0.025em;
+  line-height: 1.2;
+}
+
+.dashboard-subtitle {
+  color: var(--text-secondary);
+  font-size: 1rem;
+  margin: 0 0 var(--spacing-lg) 0;
+  line-height: 1.5;
 }
 
 .header-controls {
   display: flex;
   align-items: center;
+  justify-content: center;
   gap: var(--spacing-lg);
+  margin-bottom: var(--spacing-lg);
 }
 
 /* 语言切换组件样式 */
@@ -239,18 +252,7 @@
   background: var(--accent-hover);
 }
 
-.dashboard-title {
-  font-size: 2rem;
-  font-weight: 700;
-  color: var(--text-primary);
-  margin-bottom: var(--spacing-sm);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: var(--spacing-sm);
-  letter-spacing: -0.025em;
-  line-height: 1.2;
-}
+
 
 /* 主题切换组件样式 */
 .theme-switch {
@@ -738,6 +740,8 @@
   /* 移动端主题切换按钮 */
   .header-controls {
     gap: var(--spacing-sm);
+    justify-content: center;
+    margin-bottom: var(--spacing-lg);
   }
 
   /* 移动端 Powered by 样式优化 */
@@ -758,26 +762,7 @@
     height: 20px;
   }
 
-  /* 移动端语言切换样式 */
-  .header-top {
-    flex-direction: column;
-    align-items: center;
-    gap: var(--spacing-sm);
-  }
 
-  .dashboard-title {
-    order: 1;
-  }
-
-  .language-switch {
-    order: 2;
-    font-size: 0.75rem;
-  }
-
-  .language-button {
-    padding: var(--spacing-xs) var(--spacing-sm);
-    font-size: 0.6875rem;
-  }
 
 }
 

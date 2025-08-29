@@ -149,15 +149,13 @@ const Dashboard = ({ accounts, selectedPeriod, onPeriodChange }) => {
     return (
       <div className="dashboard">
         <div className="dashboard-header">
-          <div className="header-top">
-            <h1 className="dashboard-title">
-              <img src="/favicon.svg" alt="Cloudflare" className="dashboard-icon" />
-              {t('dashboardTitle')}
-            </h1>
-            <div className="header-controls">
-              <ThemeSwitch />
-              <LanguageSwitch />
-            </div>
+          <h1 className="dashboard-title">
+            <img src="/favicon.svg" alt="Cloudflare" className="dashboard-icon" />
+            {t('dashboardTitle')}
+          </h1>
+          <div className="header-controls">
+            <ThemeSwitch />
+            <LanguageSwitch />
           </div>
           <p className="dashboard-subtitle">{t('noData')}</p>
         </div>
@@ -204,17 +202,17 @@ const Dashboard = ({ accounts, selectedPeriod, onPeriodChange }) => {
 
       {/* 标题区域 */}
       <div className="dashboard-header">
-        <div className="header-top">
-          <h1 className="dashboard-title">
-            <img src="/favicon.svg" alt="Cloudflare" className="dashboard-icon" />
-            {t('dashboardTitle')}
-          </h1>
-          <div className="header-controls">
-            <ThemeSwitch />
-            <LanguageSwitch />
-          </div>
-        </div>
+        <h1 className="dashboard-title">
+          <img src="/favicon.svg" alt="Cloudflare" className="dashboard-icon" />
+          {t('dashboardTitle')}
+        </h1>
         <p className="dashboard-subtitle">{t('dashboardSubtitle')}</p>
+        
+        {/* 主题和语言控制器 */}
+        <div className="header-controls">
+          <ThemeSwitch />
+          <LanguageSwitch />
+        </div>
         
         {/* 时间段选择器 */}
         <div className="period-selector">
