@@ -2,6 +2,8 @@
 
 多账户、多 Zone 的 Cloudflare 流量分析仪表盘
 
+**[Demo](https://analytics.geekertao.top)**
+
 中文 | [English](./README_EN.md)
 
 ## 功能特性
@@ -9,11 +11,14 @@
 - 支持多个 Cloudflare 账户
 - 多 Zone 流量监控
 - 实时数据图表展示
-- 30 天历史数据分析
-- 单日和三日数据支持小时级精度
-- 七天和三十天数据支持天级精度
+- 历史数据分析（支持 1 天、3 天、7 天、30 天）
+- 数据精度智能切换：
+  - **1 天和 3 天数据**：小时级精度
+  - **7 天和 30 天数据**：天级精度
 - 多语言支持（中文/英文）
-- **地理位置统计**：柱状图和列表显示前 5 个国家/地区的当天访问统计（仅在单日数据视图中显示）
+- 地理位置统计（前 5 个国家/地区访问统计）
+- 缓存分析和性能监控
+- 响应式设计（完美适配桌面端和移动端）
 
 ## 技术栈
 
@@ -23,13 +28,36 @@
 
 ## 快速开始
 
-### 快速开始
+### ⚡ 一键快速部署
 
-#### 配置方式（支持环境变量！）
+如果您想要最快速的部署方式，只需运行以下命令：
 
-现在支持三种配置方式，按优先级排序：
+```bash
+# 创建项目目录
+mkdir cloudflare-analytics
+cd cloudflare-analytics
 
-##### 方式 1: 环境变量配置（推荐）
+# 下载 Docker Compose 配置文件
+wget https://raw.githubusercontent.com/Geekertao/cloudflare-analytics/main/docker-compose.yml
+
+# 编辑配置文件（添加您的 Cloudflare Token 和 Zone 信息）
+nano docker-compose.yml  # 或使用 vim docker-compose.yml
+
+# 启动服务
+sudo docker compose -f docker-compose.yml up -d
+```
+
+🎯 **部署完成后**：
+
+- 访问 `http://ip:端口` 查看仪表盘
+- 确保在 `docker-compose.yml` 中正确配置了您的 Cloudflare API Token 和 Zone 信息
+- 首次启动可能需要几分钟来获取数据
+
+### 📋 详细部署方式
+
+现在支持三种部署方式，按优先级排序：
+
+#### 方式 1: Docker Run 命令（单容器部署）
 
 ```bash
 # 单账户配置
@@ -58,19 +86,7 @@ docker run -p 80:80 \
   geekertao/cloudflare-analytics
 ```
 
-##### 方式 2: Docker Compose 配置
-
-编辑 `docker-compose.yml` 文件，修改 environment 部分：
-
-```yaml
-environment:
-  - CF_TOKENS=your_cf_token_here
-  - CF_ZONES=zone_id_1,zone_id_2
-  - CF_DOMAINS=example.com,cdn.example.com
-  - CF_ACCOUNT_NAME=我的主账户
-```
-
-##### 方式 3: 配置文件（传统方式）
+#### 方式 2: 配置文件（传统方式）
 
 编辑 `server/zones.yml` 文件：
 
@@ -83,13 +99,13 @@ accounts:
         zone_id: "你的Zone ID"
 ```
 
-#### 本地开发步骤
+### 🚀 本地开发步骤
 
 1. 克隆项目
 
 ```bash
-git clone <repository-url>
-cd Cloudflare-Analytics
+git clone https://github.com/Geekertao/cloudflare-analytics.git
+cd cloudflare-analytics
 ```
 
 2. 生成 package-lock.json 文件（重要！）
@@ -115,7 +131,7 @@ docker run -p 80:80 \
   -e CF_TOKENS="your_token" \
   -e CF_ZONES="your_zone_id" \
   -e CF_DOMAINS="your_domain" \
-  cf-analytics
+  cloudflare-analytics
 ```
 
 ### Cloudflare API Token 配置
@@ -144,14 +160,14 @@ docker run -p 80:80 \
 - 例如：只配置 3 个重要的 Zone 进行监控
 - 系统会显示：`配置加载成功: 1 个账户 (3 个 zones)`
 
-#### 验证日志示例
+#### 日志示例
 
 ```bash
 [Token验证] Token可访问 10 个Zone              # ← Token 权限范围
-✓ 账户 Geekertao Token验证成功，可访问 10 个Zone
-  ✓ Zone geekertao.top (xxx) 可访问            # ← 配置的具体Zone
-  ✓ Zone dpik.top (xxx) 可访问
-  ✓ Zone felicity.ac.cn (xxx) 可访问
+✓ 账户 Test Token验证成功，可访问 10 个Zone
+  ✓ Zone example.top (xxx) 可访问            # ← 配置的具体Zone
+  ✓ Zone example.com (xxx) 可访问
+  ✓ Zone example.cn (xxx) 可访问
 
 配置加载成功: 1 个账户 (3 个 zones)              # ← 实际监控的Zone数量
 ```
@@ -166,33 +182,19 @@ docker run -p 80:80 \
 ### 数据更新频率
 
 - 后端数据更新：**每 2 小时更新一次**
-- 数据精度：
-  - **单日和三日数据**：小时级精度（最多 168 个数据点）
-  - **七天和三十天数据**：天级精度（最多 45 个数据点）
-
-### 解决 GitHub Actions 构建问题
-
-如果遇到`npm ci`相关的构建错误，请确保：
-
-1. 所有 package-lock.json 文件都已生成并提交到 git
-2. package.json 和 package-lock.json 版本匹配
-3. 运行上述第 2 步的命令重新生成 lock 文件
+- 数据量控制：
+  - 小时级数据：最多 168 个数据点（7 天范围）
+  - 天级数据：最多 45 个数据点（45 天范围）
 
 ### 环境变量
 
 - `NGINX_PORT`: Nginx 端口 (默认: 80)
-- `CF_TOKENS`: Cloudflare API 令牌（单账户用逗号分隔）
-- `CF_ZONES`: Zone ID（逗号分隔）
-- `CF_DOMAINS`: 域名（逗号分隔）
+- `CF_TOKENS`: Cloudflare API 令牌（每个账户用英文逗号分隔）
+- `CF_ZONES`: Zone ID（英文逗号分隔）
+- `CF_DOMAINS`: 域名（英文逗号分隔）
 - `CF_ACCOUNT_NAME`: 账户显示名称
 
 ## 功能概览
-
-### 多语言支持
-
-- 支持中文和英文界面
-- 语言偏好本地保存
-- 实时语言切换
 
 ### 数据可视化
 
@@ -200,26 +202,20 @@ docker run -p 80:80 \
 - **缓存分析**：请求和带宽缓存统计，配有饼状图
 - **地理位置统计**：显示当天前 5 个国家/地区的访问量（仅在单日数据视图中显示）
 - **流量趋势**：显示小时/天级趋势的折线图
-- **响应式设计**：完美适配桌面端和移动端
 
-### 时间范围选择
-
-- **单日数据**：小时级数据（24 个数据点）
-- **三日数据**：小时级数据（72 个数据点）
-- **七日数据**：天级数据（7 个数据点）
-- **三十日数据**：天级数据（30 个数据点）
-
-## GitHub Actions
+## CI/CD 自动化
 
 本项目使用 GitHub Actions 自动构建并推送 Docker 镜像到 GitHub Container Registry 和 Docker Hub。
 
-构建触发条件：
+**构建触发条件**：
 
-- 推送到 `main` 或 `master` 分支
+- 推送到 `main` 分支
 - 创建 Pull Request
 - 手动触发
 
-所需的 GitHub Secrets：
+## 若您 Fork 项目并修改了配置，请确保在 GitHub Secrets 中添加以下密钥，以允许 CI/CD 推送到您的 Docker 仓库。
+
+**所需的 GitHub Secrets**：
 
 - `DOCKERHUB_USERNAME`: Docker Hub 用户名
 - `DOCKERHUB_TOKEN`: Docker Hub 访问令牌

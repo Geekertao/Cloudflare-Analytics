@@ -2,6 +2,8 @@
 
 Multi-account, multi-zone Cloudflare traffic analytics dashboard
 
+**[Demo](https://analytics.geekertao.top)**
+
 English | [中文](./README.md)
 
 ## Features
@@ -9,11 +11,14 @@ English | [中文](./README.md)
 - Support for multiple Cloudflare accounts
 - Multi-zone traffic monitoring
 - Real-time data chart display
-- 30-day historical data analysis
-- Hourly precision for 1-day and 3-day data
-- Daily precision for 7-day and 30-day data
+- Historical data analysis (supports 1, 3, 7, 30 days)
+- Smart data precision switching:
+  - **1-day and 3-day data**: Hourly precision
+  - **7-day and 30-day data**: Daily precision
 - Multi-language support (Chinese/English)
-- **Geography Statistics**: Bar chart and list display of today's top 5 countries/regions by traffic (only shown in 1-day data view)
+- Geography statistics (top 5 countries/regions traffic stats)
+- Cache analysis and performance monitoring
+- Responsive design (perfect for desktop and mobile)
 
 ## Tech Stack
 
@@ -23,11 +28,36 @@ English | [中文](./README.md)
 
 ## Quick Start
 
-### Configuration Methods (Environment Variables Supported!)
+### ⚡ One-Click Quick Deployment
 
-Now supports three configuration methods, listed by priority:
+If you want the fastest deployment method, just run the following commands:
 
-#### Method 1: Environment Variable Configuration (Recommended)
+```bash
+# Create project directory
+mkdir cloudflare-analytics
+cd cloudflare-analytics
+
+# Download Docker Compose configuration file
+wget https://raw.githubusercontent.com/Geekertao/cloudflare-analytics/main/docker-compose.yml
+
+# Edit configuration file (add your Cloudflare Token and Zone information)
+nano docker-compose.yml  # or use vim docker-compose.yml
+
+# Start services
+sudo docker compose -f docker-compose.yml up -d
+```
+
+🎯 **After deployment**:
+
+- Visit `http://ip:port` to view the dashboard
+- Make sure you've correctly configured your Cloudflare API Token and Zone information in `docker-compose.yml`
+- First startup may take a few minutes to fetch data
+
+### 📋 Detailed Deployment Methods
+
+Now supports three deployment methods, listed by priority:
+
+#### Method 1: Docker Run Commands (Single Container Deployment)
 
 ```bash
 # Single account configuration
@@ -56,19 +86,7 @@ docker run -p 80:80 \
   geekertao/cloudflare-analytics
 ```
 
-#### Method 2: Docker Compose Configuration
-
-Edit the `docker-compose.yml` file and modify the environment section:
-
-```yaml
-environment:
-  - CF_TOKENS=your_cf_token_here
-  - CF_ZONES=zone_id_1,zone_id_2
-  - CF_DOMAINS=example.com,cdn.example.com
-  - CF_ACCOUNT_NAME=My Primary Account
-```
-
-#### Method 3: Configuration File (Traditional Method)
+#### Method 2: Configuration File (Traditional Method)
 
 Edit the `server/zones.yml` file:
 
@@ -81,13 +99,13 @@ accounts:
         zone_id: "Your Zone ID"
 ```
 
-### Local Development Steps
+### 🚀 Local Development Steps
 
 1. Clone the project
 
 ```bash
-git clone <repository-url>
-cd Cloudflare-Analytics
+git clone https://github.com/Geekertao/cloudflare-analytics.git
+cd cloudflare-analytics
 ```
 
 2. Generate package-lock.json files (Important!)
@@ -146,10 +164,10 @@ You can create the token at: https://dash.cloudflare.com/profile/api-tokens
 
 ```bash
 [Token Validation] Token can access 10 zones              # ← Token permission scope
-✓ Account Geekertao token validation successful, can access 10 zones
-  ✓ Zone geekertao.top (xxx) accessible                   # ← Specific configured zones
-  ✓ Zone dpik.top (xxx) accessible
-  ✓ Zone felicity.ac.cn (xxx) accessible
+✓ Account Test token validation successful, can access 10 zones
+  ✓ Zone example.top (xxx) accessible                   # ← Specific configured zones
+  ✓ Zone example.com (xxx) accessible
+  ✓ Zone example.cn (xxx) accessible
 
 Configuration loaded successfully: 1 account (3 zones)    # ← Actually monitored zone count
 ```
@@ -164,9 +182,9 @@ Configuration loaded successfully: 1 account (3 zones)    # ← Actually monitor
 ### Data Update Frequency
 
 - Backend data updates: **Every 2 hours**
-- Data precision:
-  - **1-day and 3-day data**: Hourly precision (up to 168 data points)
-  - **7-day and 30-day data**: Daily precision (up to 45 data points)
+- Data volume control:
+  - Hourly data: Up to 168 data points (7-day range)
+  - Daily data: Up to 45 data points (45-day range)
 
 ### Troubleshooting GitHub Actions Build Issues
 
@@ -179,18 +197,12 @@ If you encounter `npm ci` related build errors, please ensure:
 ### Environment Variables
 
 - `NGINX_PORT`: Nginx port (default: 80)
-- `CF_TOKENS`: Cloudflare API tokens (comma-separated for single account)
+- `CF_TOKENS`: Cloudflare API tokens (comma-separated for each account)
 - `CF_ZONES`: Zone IDs (comma-separated)
 - `CF_DOMAINS`: Domain names (comma-separated)
 - `CF_ACCOUNT_NAME`: Account display name
 
 ## Features Overview
-
-### Multi-language Support
-
-- Supports Chinese and English interfaces
-- Language preference is saved locally
-- Real-time language switching
 
 ### Data Visualization
 
@@ -198,26 +210,20 @@ If you encounter `npm ci` related build errors, please ensure:
 - **Cache Analytics**: Request and bandwidth cache statistics with pie charts
 - **Geography Analytics**: Shows today's top 5 countries/regions by traffic volume (only displayed in 1-day data view)
 - **Traffic Trends**: Line charts showing hourly/daily trends
-- **Responsive Design**: Perfect adaptation for desktop and mobile
 
-### Time Range Selection
-
-- **1 Day**: Hourly data (24 data points)
-- **3 Days**: Hourly data (72 data points)
-- **7 Days**: Daily data (7 data points)
-- **30 Days**: Daily data (30 data points)
-
-## GitHub Actions
+## CI/CD Automation
 
 This project uses GitHub Actions to automatically build and push Docker images to GitHub Container Registry and Docker Hub.
 
-Build triggers:
+**Build triggers**:
 
 - Push to `main` or `master` branch
 - Create Pull Request
 - Manual trigger
 
-Required GitHub Secrets:
+## If you fork the project and modify the configuration, please ensure you add the following secrets to GitHub Secrets to allow CI/CD to push to your Docker repository.
+
+**Required GitHub Secrets**:
 
 - `DOCKERHUB_USERNAME`: Docker Hub username
 - `DOCKERHUB_TOKEN`: Docker Hub access token
@@ -230,39 +236,5 @@ Required GitHub Secrets:
 ├── .github/workflows/      # GitHub Actions configuration
 ├── dockerfile              # Docker build configuration
 ├── nginx.conf.template     # Nginx configuration template
-├── start.sh               # Container startup script
-├── docker-compose.yml     # Docker Compose configuration
-└── generate-lockfiles.js  # Helper script for generating lock files
+└── start.sh               # Container startup script
 ```
-
-## API Endpoints
-
-- `GET /health` - Health check
-- `GET /api/status` - API status information
-- `GET /data/analytics.json` - Analytics data (updated every 2 hours)
-
-## Contributing
-
-1. Fork the repository
-2. Create your feature branch (`git checkout -b feature/AmazingFeature`)
-3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
-4. Push to the branch (`git push origin feature/AmazingFeature`)
-5. Open a Pull Request
-
-## License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
-## Support
-
-If you encounter any issues or have questions, please:
-
-1. Check the [Issues](https://github.com/Geekertao/Cloudflare-Analytics/issues) page
-2. Create a new issue with detailed information
-3. Ensure you have proper Cloudflare API token permissions
-
-## Acknowledgments
-
-- [Cloudflare](https://cloudflare.com) for providing the Analytics API
-- [Recharts](https://recharts.org) for the charting library
-- [React](https://reactjs.org) for the frontend framework
