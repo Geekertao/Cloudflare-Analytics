@@ -2,11 +2,15 @@
   "name": "cf-analytics-server",
   "version": "1.0.0",
   "description": "Cloudflare Analytics API Server",
-  "main": "index.js",
+  "main": "main.js",
   "type": "module",
   "scripts": {
-    "start": "node index.js",
-    "dev": "node --watch index.js"
+    "start": "node main.js",
+    "start:cn": "node main.js",
+    "start:en": "USE_ENGLISH=true node main.js",
+    "dev": "node --watch main.js",
+    "dev:cn": "node --watch main.js",
+    "dev:en": "USE_ENGLISH=true node --watch main.js"
   },
   "dependencies": {
     "express": "^4.19.2",

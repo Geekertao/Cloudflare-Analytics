@@ -26,6 +26,48 @@ English | [中文](./README.md)
 - Backend: Node.js + Express
 - Deployment: Docker + Nginx
 
+## Multi-language Support
+
+This project supports both Chinese (default) and English interfaces. You can switch languages using environment variables:
+
+### Backend Language Switching
+
+- **Chinese (default)**: No environment variable needed
+- **English**: Set `USE_ENGLISH=true`
+
+Example:
+
+```bash
+# Start with Chinese interface (default)
+npm start
+
+# Start with English interface
+USE_ENGLISH=true npm start
+```
+
+### Frontend Language Switching
+
+The frontend automatically detects the backend language and displays the corresponding interface. No additional configuration is required.
+
+### Docker Deployment Language Switching
+
+When deploying with Docker, you can set the language through environment variables:
+
+```bash
+# Chinese interface (default)
+docker run -p 80:80 \
+  -e CF_TOKENS="your_cloudflare_api_token" \
+  -e CF_ZONES="zone_id_1,zone_id_2" \
+  geekertao/cloudflare-analytics
+
+# English interface
+docker run -p 80:80 \
+  -e CF_TOKENS="your_cloudflare_api_token" \
+  -e CF_ZONES="zone_id_1,zone_id_2" \
+  -e USE_ENGLISH=true \
+  geekertao/cloudflare-analytics
+```
+
 ## Quick Start
 
 ### ⚡ One-Click Quick Deployment
