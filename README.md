@@ -2,7 +2,10 @@
 
 多账户、多 Zone 的 Cloudflare 流量分析仪表盘
 
-**[Demo](https://analytics.geekertao.top)**
+**[Demo](https://analytics.geekertao.top)** 
+
+[博客文章教程(含视频部署教程)](https://blog.geekertao.top/posts/cloudflare-analytics)
+
 
 中文 | [English](./README_EN.md)
 
